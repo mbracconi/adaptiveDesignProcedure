@@ -24,45 +24,6 @@ from sklearn.inspection import permutation_importance
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
 
-
-def getRate(press):
-    pA = press[:,0]
-		
-    z = pA
-    u = 150
-	
-    rate = 1/(1+np.exp(-u*(z-0.5)))*(1/(z**1))+1
-    return rate.reshape(-1,1)
-
-
-#/usr/bin python3
-"""
-    A file to describe iterative refinment of samplig space using random forest
-    written by Mauro Bracconi, all rights reserved. 2019-2020
-    Former contributor: Theo Bernier
-"""
-
-import numpy as np
-import matplotlib.pyplot as plt
-import os
-import shutil
-import time
-from sklearn.ensemble import ExtraTreesRegressor
-from sklearn.inspection import permutation_importance
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.metrics import mean_squared_error,r2_score
-from sklearn.model_selection import GridSearchCV
-from sklearn.model_selection import learning_curve
-from sklearn.kernel_ridge import KernelRidge
-from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C, RationalQuadratic, WhiteKernel, Matern
-from sklearn.svm import SVR
-import GPy
-
-import traceback
-import joblib
-
-
 def getRate(press):
     pA = press[:,0]
 		
@@ -168,8 +129,6 @@ class adaptiveDesignProcedure:
        
         # Construct and set the scaler
         slf.scalerout = MinMaxScaler(feature_range=(1e-6,1))
-        slf.kernel = 1.0 * Matern(0.5, (1e-3,1),nu = 2.5) + WhiteKernel(0.2) #+ 1.0 *RationalQuadratic(length_scale=5, alpha=0.2)
-        slf.gp = GaussianProcessRegressor(kernel=slf.kernel, n_restarts_optimizer = 3, normalize_y = True)
         
         # For plotting purpose
         slf.fig = plt.figure(figsize=(10,4))
@@ -248,21 +207,7 @@ class adaptiveDesignProcedure:
             ind_data = ind_data.ravel()
         
         # Fit Trees
-        slf.reg.fit(trainingData[:,0:slf.numberOfInputVariables],ind_data)
-        
-        # Fit GP
-        # Generate training data meshgrid
-        input_var_list = np.full((slf.numberOfInputVariables,), 50)
-        mgrid = np.meshgrid(*input_var_list,indexing='ij')
-        x = mgrid[0].ravel()
-        for k in range(1,len(mgrid)) :
-            x = np.c_[x, mgrid[k].ravel()]
-        if (len(x.shape) == 1) : # one independent variable
-            x = x.reshape(-1,1)
-        y_et = slf.reg.predict(x)
-        slf.gp.fit(x,y_et)
-        
-        
+        slf.reg.fit(trainingData[:,0:slf.numberOfInputVariables],ind_data) 
  
     def approximationError(slf, queryDataVal,oldForestQuery, typevar) :
         """Compute the iterative approximation error (RAD) used for analysis of the convergence of the procedure as Mean Squared Logarithmic Error (MSLE)
@@ -1048,7 +993,7 @@ class adaptiveDesignProcedure:
             joblib.dump([slf.reg, slf.scalerout], slf.forestFile[0:slf.forestFile.index('.')]+'_'+str(k)+'.pkl',compress=1)
 
         #Save trees
-        joblib.dump([slf.reg, slf.gp, slf.scalerout], slf.forestFile)
+        joblib.dump([slf.reg, slf.scalerout], slf.forestFile)
 
         #PredictionVSQuery
         ratesDI =np.loadtxt(slf.queryTabVar,skiprows=1,delimiter=',')
