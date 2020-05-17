@@ -183,9 +183,9 @@ class adaptiveDesignProcedure:
         slf.ax[1].set_xlabel(r'Rate MK [kmol $\mathregular{m^{-2} s^{-1}}$]')
         
         # Create supporting folders
-        #if os.path.exists('tmp') :
-        #    shutil.rmtree('tmp')
-        #os.mkdir('tmp')
+        if os.path.exists('tmp') :
+            shutil.rmtree('tmp')
+        os.mkdir('tmp')
         if os.path.exists('figures') :
             shutil.rmtree('figures')
         os.mkdir('figures')
