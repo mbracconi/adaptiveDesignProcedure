@@ -22,8 +22,8 @@ Most of the theoretical aspects behind **adaptiveDesignProcedure** are reported 
 
 M. Bracconi and M. Maestri, "Training set design for Machine Learning techniques applied to the approximation of computationally intensive first-principles kinetic models", Chemical Engineering Journal, 2020, DOI: [10.1016/j.cej.2020.125469](https://doi.org/10.1016/j.cej.2020.125469)
 
-## Usage:
-Run in a terminal main.py to reproduce "Showcase of the procedure" (Section 4.1) of M. Bracconi & M. Maestri, Chemical Engineering Journal, 2020, DOI: 10.1016/j.cej.2020.125469
+## Example:
+Run in a terminal example.py to reproduce "Showcase of the procedure" (Section 4.1) of M. Bracconi & M. Maestri, Chemical Engineering Journal, 2020, DOI: 10.1016/j.cej.2020.125469
 
 ## **Requirements:**
 * [numpy](https://numpy.org/)
