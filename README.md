@@ -3,7 +3,7 @@
 A design procedure of the training data for Machine Learning algorithms able to iteratively add datapoints according to function discrete gradient.
 
 ## Authors:
-* Mauro Bracconi (mauro.bracconi@polimi.it)
+**adaptiveDesignProcedure** is developed and mantained at the Laboratory of Catalysis and Catalytic Process of Politecnico di Milano by Dr. Mauro Bracconi (mauro.bracconi@polimi.it) under the [ERC SHAPE](http://www.shape.polimi.it/) project held by Prof. Matteo Maestri
 
 ## Installation:
 Clone the repository:
