@@ -1,6 +1,10 @@
 *.pyc
+*.tif
+*.pkl
 
 adaptiveDesignProcedure.egg-info /
 build/
+figures/
+tmp/
 dist/
 __pycache__/
