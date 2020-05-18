@@ -12,11 +12,11 @@ M. Bracconi and M. Maestri, "Training set design for Machine Learning techniques
 
 ## Installation:
 Clone the repository:
-```
+```bash
 git clone https://github.com/mbracconi/adaptiveDesignProcedure.git
 ```
 Change directory:
-```
+```bash
 cd adaptiveDesignProcedure
 ```
 The **adaptiveDesignProcedure** class is in the adaptiveDesignProcedure.py file
