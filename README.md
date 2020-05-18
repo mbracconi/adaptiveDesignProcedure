@@ -14,6 +14,8 @@ Change directory:
 ```
 cd adaptiveDesignProcedure
 ```
+The **adaptiveDesignProcedure** class is in the adaptiveDesignProcedure.py file
+
 
 ## Reference & How to cite:
 Most of the theoretical aspects behind **adaptiveDesignProcedure** are reported in:
