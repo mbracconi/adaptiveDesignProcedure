@@ -1,6 +1,0 @@
-numpy
-scipy
-matplotlib
-scikit-learn
-Sphinx==1.4
-sphinx_rtd_theme
