@@ -8,6 +8,11 @@ Welcome to adaptiveDesignProcedure's documentation!
 
 A design procedure of the training data for Machine Learning algorithms able to iteratively add datapoints according to function discrete gradient.
 
+Reference & How to cite
+------------------------
+Most of the theoretical aspects behind adaptiveDesignProcedure are reported in:
+M. Bracconi and M. Maestri, "Training set design for Machine Learning techniques applied to the approximation of computationally intensive first-principles kinetic models", Chemical Engineering Journal, 2020, DOI:`10.1016/j.cej.2020.125469 <https://doi.org/10.1016/j.cej.2020.125469>`_.
+
 Installation
 --------------------
 The official distribution is on GitHub, and you can clone the repository using:
