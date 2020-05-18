@@ -13,13 +13,22 @@ M. Bracconi and M. Maestri, "Training set design for Machine Learning techniques
 ## Installation:
 Clone the repository:
 ```bash
-git clone https://github.com/mbracconi/adaptiveDesignProcedure.git
+> git clone https://github.com/mbracconi/adaptiveDesignProcedure.git
 ```
 Change directory:
 ```bash
-cd adaptiveDesignProcedure
+> cd adaptiveDesignProcedure
 ```
-The **adaptiveDesignProcedure** class is in the adaptiveDesignProcedure.py file
+To install the package type:
+```bash
+> python setup.py install
+```
+
+To uninstall the package you have to rerun the installation and record the installed files in order to remove them:
+```bash
+> python setup.py install --record installed_files.txt
+> cat installed_files.txt | xargs rm -rf
+```
 
 ## Documentation :
 **adaptiveDesignProcedure** uses [Sphinx](http://www.sphinx-doc.org/en/stable/) for code documentation. To build the html versions of the docs simply:
