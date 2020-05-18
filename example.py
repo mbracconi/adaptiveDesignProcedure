@@ -57,7 +57,7 @@ import sys
 forestParams={
         'Ntree'       : 200,
         'tps'         : 1,
-        'fraction'    : 0.85,
+        'fraction'    : 0.9,
     }
 
 # Algorithm paramters

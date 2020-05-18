@@ -392,8 +392,9 @@ class adaptiveDesignProcedure:
         plt.draw()
         plt.pause(0.001)
         
+        pline=np.array([np.min(ratesDI[idx1])*0.8,np.max(ratesDI[idx1])*1.2])
+        ticks = np.linspace(np.min(pline),np.max(pline),6)
         if(iterC == 0) :
-            pline=np.array([min(np.min(ratesDI[idx1]),np.min(pred[idx1]))*0.8,max(np.max(ratesDI[idx1]),np.max(pred[idx1]))*1.2])
             plt.sca(slf.ax[1])
             plt.cla()
             plt.xlim(np.min(pline),np.max(pline))
@@ -401,18 +402,74 @@ class adaptiveDesignProcedure:
             slf.ax[1].plot(pline,pline,'k-',linewidth=1)
             slf.ax[1].plot(pline,pline*0.7,'k--',linewidth=0.5)
             slf.ax[1].plot(pline,pline*1.3,'k--',linewidth=0.5)
+            plt.xticks(ticks)
+            plt.yticks(ticks)
 
-        
         slf.ax[1].plot(ratesDI[idx1],pred[idx1], 'o', markersize=3,label = slf.headersTabVar[indexTabVariable] + ' - #' + str(iterC))
-        slf.ax[1].set_ylabel(r'Rate ET [kmol $\mathregular{m^{-2} s^{-1}}$]')
-        slf.ax[1].set_xlabel(r'Rate MK [kmol $\mathregular{m^{-2} s^{-1}}$]')
+        slf.ax[1].set_ylabel(slf.headersTabVar[indexTabVariable] + r'$\mathregular{_{ET}}$')
+        slf.ax[1].set_xlabel(slf.headersTabVar[indexTabVariable] + r'$\mathregular{_{MD}}$')
         plt.sca(slf.ax[1])
-        #plt.locator_params(axis = 'y', nbins=5)
-        #plt.locator_params(axis = 'x', nbins=5)
         slf.ax[1].legend(loc='center left', bbox_to_anchor=(1, 0.5))
         plt.draw()
         plt.pause(0.001)
         plt.savefig('figures/trend_'+slf.headersInVar[indexTabVariable]+'_'+str(iterC)+'.tif', dpi=600)
+
+    def plotParity(slf) :
+        """Plot parity plot with ExtraTrees obtained at the end of the procedure
+        
+        Parameters
+        ----------
+            indexTabVariable : int
+                Index of the variables considered
+            iterC : int
+                Current iteration of the procedure
+            typevar : string
+                Define how to treat the tabulated variable (either 'log' or 'lin')
+                
+        """
+
+        ratesDI = np.loadtxt(slf.queryTabVar,skiprows=1,delimiter=',')                
+        queryData = np.loadtxt(slf.queryFile, skiprows=1, delimiter=',')
+        
+        if(len(ratesDI.shape) == 1) :
+            ratesDI = ratesDI.reshape(-1,1)
+			
+        if(len(queryData.shape) == 1) :
+            queryData = queryData.reshape(-1,1)
+        
+        pred = slf.reg.predict(queryData)
+        
+        if(len(pred.shape) == 1) :
+            pred = pred.reshape(-1,1)
+        
+        for k in range(slf.numberOfTabVariables) :
+            if(slf.typevarTabVar[k] == 'log') :
+                pred[:,k] = slf.scalerout.inverse_transform(10**pred)[:,k]
+            elif (slf.typevarTabVar[k] == 'lin') :
+                pred[:,k] = slf.scalerout.inverse_transform(pred)[:,k]
+
+        for k in range(slf.numberOfTabVariables) :
+            plt.figure()
+            pline=np.array([min(np.min(ratesDI[:,k]),np.min(pred))*0.8,max(np.max(ratesDI[:,k]),np.max(pred))*1.2])
+            ticks = np.linspace(np.min(pline),np.max(pline),6)
+            plt.xlim(np.min(pline),np.max(pline))
+            plt.ylim(np.min(pline),np.max(pline))
+           
+			
+            plt.plot(ratesDI[:,k],pred[:,k], 'o', markersize=3)
+            plt.ylabel(slf.headersTabVar[k] + r'$\mathregular{_{ET}}$')
+            plt.xlabel(slf.headersTabVar[k] + r'$\mathregular{_{MD}}$')
+            plt.plot(pline,pline,'k-',linewidth=1)
+            plt.plot(pline,pline*0.7,'k--',linewidth=0.5)
+            plt.plot(pline,pline*1.3,'k--',linewidth=0.5)
+            plt.legend(slf.headersTabVar, loc='center left', bbox_to_anchor=(1, 0.5))
+            plt.xticks(ticks)
+            plt.yticks(ticks)
+			
+            plt.tight_layout()
+            plt.savefig('figures/parity_'+slf.headersTabVar[k]+'.tif', dpi=600, pil_kwargs={"compression": "tiff_lzw"})
+
+
 
     ## Function which select the position for the newly added points at each iteration
     def findPoints(slf, trainData, pointsToAdd):
@@ -424,13 +481,11 @@ class adaptiveDesignProcedure:
                 Matrix consisting of the training data variables and function rate
             pointsToAdd : np.array
                 Variables considered for the addition defined based on the variable importance
-            impotance : np.array
-                Variable importance array
                 
         Return
         ----------
-            avErrA : float
-                Percentage approximation error 
+            newPressures : np.array
+                Positions of the new points
         """
         newPressures = []
         
@@ -1090,6 +1145,7 @@ class adaptiveDesignProcedure:
         print('\n--------------------------- Procedure stats ---------------------------\n')
         if(slf.benchmark) :
             print('    * Benchmark error evolution:',slf.benchmarkErrorEv)
+            slf.plotParity()
         print('    * Training data size evolution:',slf.trainingDataSize)
         
         print('\n--------------------------------- end ---------------------------------')
