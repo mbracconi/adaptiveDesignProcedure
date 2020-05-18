@@ -1,0 +1,468 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>AdaptiveDesignProcedure &mdash; adaptiveDesignTrainingPoints 1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Welcome to adaptiveDesignProcedure’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> adaptiveDesignTrainingPoints
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">AdaptiveDesignProcedure</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">adaptiveDesignTrainingPoints</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>AdaptiveDesignProcedure</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/adaptiveDesignProcedure.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="adaptivedesignprocedure">
+<h1>AdaptiveDesignProcedure<a class="headerlink" href="#adaptivedesignprocedure" title="Permalink to this headline">¶</a></h1>
+<p>Functions of the adaptive procedure</p>
+<dl class="class">
+<dt id="adaptiveDesignProcedure.adaptiveDesignProcedure">
+<em class="property">class </em><code class="sig-prename descclassname">adaptiveDesignProcedure.</code><code class="sig-name descname">adaptiveDesignProcedure</code><span class="sig-paren">(</span><em class="sig-param">in_variables</em>, <em class="sig-param">tab_variables</em>, <em class="sig-param">forestFile</em>, <em class="sig-param">trainingFile</em>, <em class="sig-param">forestParams</em>, <em class="sig-param">algorithmParams</em>, <em class="sig-param">queryFile=None</em>, <em class="sig-param">queryTabVar=None</em>, <em class="sig-param">benchmark=True</em>, <em class="sig-param">debug=False</em><span class="sig-paren">)</span><a class="headerlink" href="#adaptiveDesignProcedure.adaptiveDesignProcedure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="adaptiveDesignProcedure.adaptiveDesignProcedure.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">in_variables</em>, <em class="sig-param">tab_variables</em>, <em class="sig-param">forestFile</em>, <em class="sig-param">trainingFile</em>, <em class="sig-param">forestParams</em>, <em class="sig-param">algorithmParams</em>, <em class="sig-param">queryFile=None</em>, <em class="sig-param">queryTabVar=None</em>, <em class="sig-param">benchmark=True</em>, <em class="sig-param">debug=False</em><span class="sig-paren">)</span><a class="headerlink" href="#adaptiveDesignProcedure.adaptiveDesignProcedure.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class constructor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>in_variables</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>[</em><em>dictionary</em><em>]</em>) – <p>Dictionaries for each independent species reporting: ‘name’ -&gt; variable name, ‘min_range’ -&gt; minimum value,’max_range’ -&gt; maximum value, ‘num’ -&gt; number of points, ‘typevar’ -&gt; type of variable (log,lin,inv)</p>
+<blockquote>
+<div><p>example:</p>
+<p>input_var = (</p>
+<blockquote>
+<div><blockquote>
+<div><p>{ ‘name’ : ‘A’, ‘min’ : 1e-3, ‘max’ : 1, ‘num’ : 4, ‘typevar’ : ‘lin’},</p>
+<p>{ ‘name’ : ‘B’, ‘min’ : 1e-3, ‘max’ : 1, ‘num’ : 3, ‘typevar’ : ‘log’}</p>
+</div></blockquote>
+<p>)</p>
+</div></blockquote>
+</div></blockquote>
+</p></li>
+<li><p><strong>out_variables</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>[</em><em>dictionary</em><em>]</em>) – <p>Dictionaries for each tabulation species reporting: ‘name’ -&gt; variable name, ‘typevar’ -&gt; type of variable (log,lin)</p>
+<blockquote>
+<div><p>example:</p>
+<p>out_variables = (</p>
+<blockquote>
+<div><blockquote>
+<div><p>{‘name’ : ‘R_A’, ‘typevar’ : ‘lin’},</p>
+<p>{‘name’ : ‘R_B’, ‘typevar’ : ‘lin’},</p>
+</div></blockquote>
+<p>)</p>
+</div></blockquote>
+</div></blockquote>
+</p></li>
+<li><p><strong>forestFile</strong> (<em>string</em>) – Path to ExtraTress final trained algorithm</p></li>
+<li><p><strong>trainingFile</strong> (<em>string</em>) – Path to training data file</p></li>
+<li><p><strong>forestParam</strong> (<em>dictionary</em>) – <p>Structure with ExtraTrees parameters</p>
+<blockquote>
+<div><p>forestParams =</p>
+<blockquote>
+<div><p>{</p>
+<blockquote>
+<div><p>‘Ntree’       : 200, # number of decision trees in the forest</p>
+<p>’tps’         : 1,   # number of record in terminal leaves</p>
+<p>’fraction’    : 0.7, # fraction of data used to grow the forest</p>
+</div></blockquote>
+<p>}</p>
+</div></blockquote>
+</div></blockquote>
+</p></li>
+<li><p><strong>algorithmParam</strong> (<em>dictionary</em>) – <p>Structure with Adaptive Design Procedure parameters</p>
+<blockquote>
+<div><p>algorithmParams =</p>
+<blockquote>
+<div><p>{</p>
+<blockquote>
+<div><p>‘dth’         : 0.1,     # thresold first derivative</p>
+<p>’d2th’        : 0.9,     # thresold second derivative</p>
+<p>’VIth’        : 0.15,    # thresold variable importance</p>
+<p>’errTh’       : 1e-6,    # thresold for MRE error evaluation (remove from MRE calculation record below this value)</p>
+<p>’OOBth’       : 0.05,    # termination criterium on OOBnorm</p>
+<p>’RADth’       : 10,      # termination criterium on Relative Approximation Error (RAD) [%]</p>
+<p>’maxTDSize’   : 40000,   # maximum allowed size of the training data</p>
+<p>’AbsOOBTh’    : 0.2,     # maximum variations between OOB for two different tabulation variables</p>
+</div></blockquote>
+<p>}</p>
+</div></blockquote>
+</div></blockquote>
+</p></li>
+<li><p><strong>queryFile</strong> (<em>string</em><em>, </em><em>optional</em>) – Path to the query file (input variables)</p></li>
+<li><p><strong>queryTabVar</strong> (<em>string</em><em>, </em><em>optional</em>) – Path to the query file (output variables)</p></li>
+<li><p><strong>benchmark</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Calculation of benchmark error and plotting</p></li>
+<li><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Print additional information during the iterations</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#adaptiveDesignProcedure.adaptiveDesignProcedure.__init__" title="adaptiveDesignProcedure.adaptiveDesignProcedure.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(in_variables, tab_variables, …[, …])</p></td>
+<td><p>Class constructor</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#adaptiveDesignProcedure.adaptiveDesignProcedure.findPoints" title="adaptiveDesignProcedure.adaptiveDesignProcedure.findPoints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">findPoints</span></code></a>(trainData, pointsToAdd)</p></td>
+<td><p>Evaluate the position of the new points based on the discrete function gradient</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#adaptiveDesignProcedure.adaptiveDesignProcedure.createTrainingDataAndML" title="adaptiveDesignProcedure.adaptiveDesignProcedure.createTrainingDataAndML"><code class="xref py py-obj docutils literal notranslate"><span class="pre">createTrainingDataAndML</span></code></a>([equidistantPoints])</p></td>
+<td><p>Generate the training set by means of the adaptive design procedure, train and save on forestFile the final ExtraTrees with all the rates and signs</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#adaptiveDesignProcedure.adaptiveDesignProcedure.addVariables" title="adaptiveDesignProcedure.adaptiveDesignProcedure.addVariables"><code class="xref py py-obj docutils literal notranslate"><span class="pre">addVariables</span></code></a>(indexTabVariable[, …])</p></td>
+<td><p>Adaptively and iteratively add points for each tabulation variables</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#adaptiveDesignProcedure.adaptiveDesignProcedure.trainExtraTressMISO" title="adaptiveDesignProcedure.adaptiveDesignProcedure.trainExtraTressMISO"><code class="xref py py-obj docutils literal notranslate"><span class="pre">trainExtraTressMISO</span></code></a>(trainingData)</p></td>
+<td><p>Train ExtraTrees algorithm for absolute value of the rate and for the sign of a single variables</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#adaptiveDesignProcedure.adaptiveDesignProcedure.trainExtraTressMIMO" title="adaptiveDesignProcedure.adaptiveDesignProcedure.trainExtraTressMIMO"><code class="xref py py-obj docutils literal notranslate"><span class="pre">trainExtraTressMIMO</span></code></a>(trainingData)</p></td>
+<td><p>Train ExtraTrees algorithm for absolute value of the rate and for the sign of all the variables togheter</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#adaptiveDesignProcedure.adaptiveDesignProcedure.approximationError" title="adaptiveDesignProcedure.adaptiveDesignProcedure.approximationError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">approximationError</span></code></a>(queryDataVal, …)</p></td>
+<td><p>Compute the iterative approximation error (RAD) used for analysis of the convergence of the procedure as Mean Squared Logarithmic Error (MSLE)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#adaptiveDesignProcedure.adaptiveDesignProcedure.plotTrends" title="adaptiveDesignProcedure.adaptiveDesignProcedure.plotTrends"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plotTrends</span></code></a>(indexTabVariable, iterC, typevar)</p></td>
+<td><p>Plot evolution of benchmark error and a parity plot of the benchmark predictions at each iteration</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#adaptiveDesignProcedure.adaptiveDesignProcedure.plotParity" title="adaptiveDesignProcedure.adaptiveDesignProcedure.plotParity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plotParity</span></code></a>()</p></td>
+<td><p>Plot parity plot with ExtraTrees obtained at the end of the procedure</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="adaptiveDesignProcedure.adaptiveDesignProcedure.addVariables">
+<code class="sig-name descname">addVariables</code><span class="sig-paren">(</span><em class="sig-param">indexTabVariable</em>, <em class="sig-param">equidistantPoints=0</em><span class="sig-paren">)</span><a class="headerlink" href="#adaptiveDesignProcedure.adaptiveDesignProcedure.addVariables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adaptively and iteratively add points for each tabulation variables</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>indexTabVariable</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Index of the tabulation variables considered</p></li>
+<li><p><strong>equidistantPoints</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Number of points in each direction of an optional evenly-distributed grid</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="adaptiveDesignProcedure.adaptiveDesignProcedure.approximationError">
+<code class="sig-name descname">approximationError</code><span class="sig-paren">(</span><em class="sig-param">queryDataVal</em>, <em class="sig-param">oldForestQuery</em>, <em class="sig-param">typevar</em><span class="sig-paren">)</span><a class="headerlink" href="#adaptiveDesignProcedure.adaptiveDesignProcedure.approximationError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the iterative approximation error (RAD) used for analysis of the convergence of the procedure as Mean Squared Logarithmic Error (MSLE)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>queryDataVal</strong> (<em>np.array</em>) – Matrix consisting of the query point</p></li>
+<li><p><strong>oldForestQuery</strong> (<em>np.array</em>) – Matrix consisting of the predictions of the queryDataValobtained with the ExtraTress obtained ad the previous iteration</p></li>
+<li><p><strong>typevar</strong> (<em>string</em>) – Define how to treat the tabulated variable (either ‘log’ or ‘lin’)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>avErrA</strong> – Percentage approximation error</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="adaptiveDesignProcedure.adaptiveDesignProcedure.benchmarkError">
+<code class="sig-name descname">benchmarkError</code><span class="sig-paren">(</span><em class="sig-param">indexTabVariable</em>, <em class="sig-param">typevar</em>, <em class="sig-param">count</em>, <em class="sig-param">msle=False</em><span class="sig-paren">)</span><a class="headerlink" href="#adaptiveDesignProcedure.adaptiveDesignProcedure.benchmarkError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the benchmark error used for analysis of accuracy of the procedure by evaluating the Mean Squared Logarithmic Error MSLE (default) or Mean Relative Error MRE:
+<span class="math notranslate nohighlight">\(MSLE=1/N \sum_{i=1}^{n_{query}}{(\log(y_i+1)-\log(\widehat{y}_i+1))^2}\)</span>
+<span class="math notranslate nohighlight">\(MRE=1/N \sum_{i=1}^{n_{query}}{|y_i-\widehat{y}_i|/|\widehat{y}_i|}\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>indexTabVariable</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Index of the variables considered</p></li>
+<li><p><strong>typevar</strong> (<em>string</em>) – Define how to treat the tabulated variable (either ‘log’ or ‘lin’)</p></li>
+<li><p><strong>msle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Matrix consisting of the predictions of the queryDataVal obtained
+with the ExtraTress obtained ad the previous iteration</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>err</strong> – Vector of the error</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="adaptiveDesignProcedure.adaptiveDesignProcedure.createBenchmarkDataset">
+<code class="sig-name descname">createBenchmarkDataset</code><span class="sig-paren">(</span><em class="sig-param">num_query</em><span class="sig-paren">)</span><a class="headerlink" href="#adaptiveDesignProcedure.adaptiveDesignProcedure.createBenchmarkDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a benchmark dataset by repetitively solving the full model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>num_query</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Number of queries where the full model is solved</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="adaptiveDesignProcedure.adaptiveDesignProcedure.createTrainingDataAndML">
+<code class="sig-name descname">createTrainingDataAndML</code><span class="sig-paren">(</span><em class="sig-param">equidistantPoints=0</em><span class="sig-paren">)</span><a class="headerlink" href="#adaptiveDesignProcedure.adaptiveDesignProcedure.createTrainingDataAndML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate the training set by means of the adaptive design procedure, train and save on forestFile the final ExtraTrees with all the rates and signs</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="adaptiveDesignProcedure.adaptiveDesignProcedure.findPoints">
+<code class="sig-name descname">findPoints</code><span class="sig-paren">(</span><em class="sig-param">trainData</em>, <em class="sig-param">pointsToAdd</em><span class="sig-paren">)</span><a class="headerlink" href="#adaptiveDesignProcedure.adaptiveDesignProcedure.findPoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the position of the new points based on the discrete function gradient</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trainData</strong> (<em>np.array</em>) – Matrix consisting of the training data variables and function rate</p></li>
+<li><p><strong>pointsToAdd</strong> (<em>np.array</em>) – Variables considered for the addition defined based on the variable importance</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>newPressures</strong> – Positions of the new points</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="adaptiveDesignProcedure.adaptiveDesignProcedure.plotParity">
+<code class="sig-name descname">plotParity</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#adaptiveDesignProcedure.adaptiveDesignProcedure.plotParity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot parity plot with ExtraTrees obtained at the end of the procedure</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>indexTabVariable</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Index of the variables considered</p></li>
+<li><p><strong>iterC</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Current iteration of the procedure</p></li>
+<li><p><strong>typevar</strong> (<em>string</em>) – Define how to treat the tabulated variable (either ‘log’ or ‘lin’)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="adaptiveDesignProcedure.adaptiveDesignProcedure.plotTrends">
+<code class="sig-name descname">plotTrends</code><span class="sig-paren">(</span><em class="sig-param">indexTabVariable</em>, <em class="sig-param">iterC</em>, <em class="sig-param">typevar</em><span class="sig-paren">)</span><a class="headerlink" href="#adaptiveDesignProcedure.adaptiveDesignProcedure.plotTrends" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot evolution of benchmark error and a parity plot of the benchmark predictions at each iteration</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>indexTabVariable</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Index of the variables considered</p></li>
+<li><p><strong>iterC</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Current iteration of the procedure</p></li>
+<li><p><strong>typevar</strong> (<em>string</em>) – Define how to treat the tabulated variable (either ‘log’ or ‘lin’)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="adaptiveDesignProcedure.adaptiveDesignProcedure.trainExtraTressMIMO">
+<code class="sig-name descname">trainExtraTressMIMO</code><span class="sig-paren">(</span><em class="sig-param">trainingData</em><span class="sig-paren">)</span><a class="headerlink" href="#adaptiveDesignProcedure.adaptiveDesignProcedure.trainExtraTressMIMO" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train ExtraTrees algorithm for absolute value of the rate and for the sign of all the variables togheter</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>trainingData</strong> (<em>np.array</em>) – Matrix consisting of the training data: first numberOfVariables columns are the descriptors followed by the absolute value rate and by the sign</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="adaptiveDesignProcedure.adaptiveDesignProcedure.trainExtraTressMISO">
+<code class="sig-name descname">trainExtraTressMISO</code><span class="sig-paren">(</span><em class="sig-param">trainingData</em><span class="sig-paren">)</span><a class="headerlink" href="#adaptiveDesignProcedure.adaptiveDesignProcedure.trainExtraTressMISO" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train ExtraTrees algorithm for absolute value of the rate and for the sign of a single variables</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>trainingData</strong> (<em>np.array</em>) – Matrix consisting of the training data: first numberOfVariables columns are the descriptors followed by the absolute value rate and by the sign</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to adaptiveDesignProcedure’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Mauro Bracconi
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
