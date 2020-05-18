@@ -1,0 +1,17 @@
+Metadata-Version: 1.1
+Name: adaptiveDesignProcedure
+Version: 0.0.1
+Summary: adaptiveDesignProcedure
+Home-page: https://github.com/mbracconi/adaptiveDesignProcedure
+Author: Mauro Bracconi
+Author-email: mauro.bracconi@polimi.it
+License: BSD
+Description: A design procedure of the training data for Machine Learningalgorithms able to iteratively add datapoints according tofunction discrete gradientReference:Most of the theoretical aspects behind adaptiveDesignProcedureare reported in:M. Bracconi and M. Maestri, Training set design for Machine Learning techniques applied to the approximation of computationally intensive first-principles kinetic models,Chemical Engineering Journal, 2020, DOI: 10.1016/j.cej.2020.125469
+        
+Keywords: machine learning; computational fluid dyamics
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Scientific/Engineering :: Chemical Engineering

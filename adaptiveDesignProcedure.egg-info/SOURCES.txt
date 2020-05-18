@@ -1,0 +1,10 @@
+README.md
+setup.py
+adaptiveDesignProcedure/__init__.py
+adaptiveDesignProcedure/adaptiveDesignProcedure.py
+adaptiveDesignProcedure.egg-info/PKG-INFO
+adaptiveDesignProcedure.egg-info/SOURCES.txt
+adaptiveDesignProcedure.egg-info/dependency_links.txt
+adaptiveDesignProcedure.egg-info/not-zip-safe
+adaptiveDesignProcedure.egg-info/requires.txt
+adaptiveDesignProcedure.egg-info/top_level.txt
