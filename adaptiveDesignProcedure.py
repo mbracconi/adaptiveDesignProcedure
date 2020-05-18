@@ -1,14 +1,37 @@
 #/usr/bin python3
 """
-    A file to describe iterative refinment of sampling space using random forest
-    written by Mauro Bracconi, all rights reserved. 2019-2020
-
-	Author: Mauro Bracconi                                   
-            mauro.bracconi@polimi.it                         
-	        Politecnico di Milano                            
-            Dipartimento di Energia                          
-            Laboratory of Catalysis and Catalytic Processes  
-	
+    /*----------------------------------------------------------------*\
+    |                                                                  |
+    |   Adaptive Refinement Procedure for Machine Leraning             |
+    |                                                                  |
+    |------------------------------------------------------------------|
+    |                                                                  |
+    |  Author: Mauro Bracconi                                          |
+    |           mauro.bracconi@polimi.it                               |                         
+    |           Politecnico di Milano                                  |
+    |           Dipartimento di Energia                                |
+    |           Laboratory of Catalysis and Catalytic Processes        |   
+    |                                                                  |
+    |------------------------------------------------------------------|
+    |                                                                  |
+	|   Copyright(C) 2019-2020 - M. Bracconi                           |
+    |                                                                  |
+    |------------------------------------------------------------------|
+    |                                                                  |
+    |   Description:                                                   |
+    |       Python class implementing the Adaptive Refinment           |
+    |       Procedure for Machine Learning using ExtraTress            |
+    |       and derivative-based addition of new points                |   
+    |                                                                  |
+    |   Version:                                                       |
+    |       * 1.0 (02/10/2020): adaptive refinement procedure          |
+    |       * 1.1 (04/08/2020): added MinMax scaling of tabulation     |
+    |                           variables                              |
+    |       * 1.2 (05/09/2020): added control on second derivative     |
+    |                           to improve description around          |
+    |                           stationary points                      |
+    |                                                                  |
+    \*----------------------------------------------------------------*/
 """
 
 import numpy as np
