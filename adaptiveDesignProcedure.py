@@ -14,7 +14,16 @@
     |                                                                  |
     |------------------------------------------------------------------|
     |                                                                  |
-	|   Copyright(C) 2019-2020 - M. Bracconi                           |
+    |   Copyright(C) 2019-2020 - M. Bracconi                           |
+    |                                                                  |
+    |------------------------------------------------------------------|
+    |                                                                  |
+    |   Reference:                                                     |
+    |       M. Bracconi and M. Maestri, "Training set design for       |
+    |       Machine Learning techniques applied to the approximation   |
+    |       of computationally intensive first-principles kinetic      |
+    |       models", Chemical Engineering Journal, 2020,               |
+    |       DOI: 10.1016/j.cej.2020.125469                             |
     |                                                                  |
     |------------------------------------------------------------------|
     |                                                                  |
@@ -58,27 +67,65 @@ def getRate(press):
 
 
 class adaptiveDesignProcedure:
-    def __init__(slf, in_variables, tab_variables, forestFile, trainingFile,
-                    forestParams, algorithmParams, queryFile, queryTabVar, benchmark = True, debug = False):
+    def __init__(slf, in_variables, 
+					   tab_variables, 
+					   forestFile, 
+					   trainingFile,
+                       forestParams, 
+                       algorithmParams, 
+                       queryFile = None, 
+                       queryTabVar = None, 
+                       benchmark = True, 
+                       debug = False ):
+						   
         """Class constructor
         
         Parameters
         ----------
             in_variables : tuple[dictionary]
                 Dictionaries for each independent species reporting: 'name' -> variable name, 'min_range' -> minimum value,'max_range' -> maximum value, 'num' -> number of points, 'typevar' -> type of variable (log,lin,inv)
+                example:
+                input_var = ( 
+                              { 'name' : 'A', 'min' : 1e-3, 'max' : 1, 'num' : 4, 'typevar' : 'lin'},
+                              { 'name' : 'B', 'min' : 1e-3, 'max' : 1, 'num' : 3, 'typevar' : 'log'}
+                            )
             out_variables : tuple[dictionary]
                 Dictionaries for each tabulation species reporting: 'name' -> variable name, 'typevar' -> type of variable (log,lin)
+                example:
+                out_variables = (  
+                                  {'name' : 'R_A', 'typevar' : 'lin'},
+                                  {'name' : 'R_B', 'typevar' : 'lin'},
+                                )
             forestFile : string
                 Path to ExtraTress final trained algorithm
             trainingFile : string
                 Path to training data file 
-            forestParam : struct
+            forestParam : dictionary
                 Structure with ExtraTrees parameters
-            algorithmParam : struct
+                example:
+                    forestParams=
+                    {
+                        'Ntree'       : 200, # number of decision trees in the forest
+                        'tps'         : 1,   # number of record in terminal leaves
+                        'fraction'    : 0.7, # fraction of data used to grow the forest
+                    }
+            algorithmParam : dictionary
                 Structure with Adaptive Design Procedure parameters
-            queryFile : string
+                example:
+                    algorithmParams=
+                    {
+                        'dth'         : 0.1,     # thresold first derivative
+                        'd2th'        : 0.9,     # thresold second derivative
+                        'VIth'        : 0.15,    # thresold variable importance
+                        'errTh'       : 1e-6,    # thresold for MRE error evaluation (remove from MRE calculation record below this value)
+                        'OOBth'       : 0.05,    # termination criterium on OOBnorm
+                        'RADth'       : 10,      # termination criterium on Relative Approximation Error (RAD) [%]
+                        'maxTDSize'   : 40000,   # maximum allowed size of the training data
+                        'AbsOOBTh'    : 0.2,     # maximum variations between OOB for two different tabulation variables
+                    }
+            queryFile : string, optional
                 Path to the query file (input variables)
-            queryTabVar : string
+            queryTabVar : string, optional
                 Path to the query file (output variables)
             benchmark : bool, optional
                 Calculation of benchmark error and plotting
@@ -223,7 +270,7 @@ class adaptiveDesignProcedure:
                 Matrix consisting of the training data: first numberOfVariables columns are the descriptors followed by the absolute value rate and by the sign
         """
         # Load training data
-        slf.reg.set_params(random_state=np.random.randint(low=1, high=20000))
+        slf.reg.set_params(random_state=np.random.randint(low=1, high=20000), bootstrap=False, oob_score = False)
         
         ind_data = trainingData[:,slf.numberOfInputVariables:]
         if (ind_data.shape[1] == 1) :
@@ -249,7 +296,7 @@ class adaptiveDesignProcedure:
             avErrA : float
                 Percentage approximation error 
         """
-        # Calcolo risultato nuove query
+        # Evaluate result new queries
         if(typevar == 'log') :
             newForestQuery = 10**slf.reg.predict(queryDataVal)
         elif (typevar == 'lin') :
@@ -257,12 +304,12 @@ class adaptiveDesignProcedure:
             
         # Select rate larger than th
         idxA = np.where(np.abs(oldForestQuery) >= slf.algorithmParams['errTh'])
-        # Compute approximation error in terms of MSLE
+        # Compute approximation error in terms of MRE
         errA = np.abs(oldForestQuery[idxA]-newForestQuery[idxA])/np.abs(oldForestQuery[idxA])
         avErrA = np.average(errA)*100.
         return avErrA
         
-    def benchmarkError(slf,indexTabVariable,typevar, count, msle = True) :
+    def benchmarkError(slf,indexTabVariable,typevar, count, msle = False) :
         """Compute the benchmark error used for analysis of accuracy of the procedure by evaluating the Mean Squared Logarithmic Error MSLE (default) or Mean Relative Error MRE: :math:`MSLE=1/N \sum_{i=1}^{n_{query}}{(\log(y_i+1)-\log(\widehat{y}_i+1))^2}` \\ :math:`MRE=1/N \sum_{i=1}^{n_{query}}{|y_i-\widehat{y}_i|/|\widehat{y}_i|}`
         
         Parameters
@@ -593,7 +640,6 @@ class adaptiveDesignProcedure:
         
         return newPressures
 
-    #@profile 
     def addVariables(slf,indexTabVariable, equidistantPoints = 0):
         """Adaptively and iteratively add points for each tabulation variables
 
@@ -610,7 +656,7 @@ class adaptiveDesignProcedure:
         imp = np.zeros([10,slf.numberOfInputVariables])
         
         # Initialize iterator counts and set iterate to true
-        count=0
+        count = 0
         iterate = True
         
         # Initialize storage of OOB and RAD
@@ -904,14 +950,6 @@ class adaptiveDesignProcedure:
 
             # Exit strategy : max counts 8 | approx error < 5 %
             if equidistantPoints == 0 :
-                if(count == 6) :
-                    iterate = False
-                    count += 1
-                else:
-                    iterate = True
-                    count += 1
-                
-                """
                 if indexTabVariable == 0 :
                     if (errA > slf.algorithmParams['RADth'] or OOB > slf.algorithmParams['OOBth']) and trainingData.shape[0] < slf.algorithmParams['maxTDSize']:
                         iterate = True
@@ -972,11 +1010,9 @@ class adaptiveDesignProcedure:
                             print ('\n      Accuracy constraints reached in',count+1,'iterations')
                             if slf.debug :
                                 print('          OOB Evolution: ',OOBspecies)
-                                print('          RAD Evolution: ',RADspecies) """
+                                print('          RAD Evolution: ',RADspecies) 
                 
 
-        
-    #@profile
     def createTrainingDataAndML(slf, equidistantPoints = 0):
         """Generate the training set by means of the adaptive design procedure, train and save on forestFile the final ExtraTrees with all the rates and signs
 
@@ -986,7 +1022,7 @@ class adaptiveDesignProcedure:
         for indexS in range(slf.numberOfTabVariables):
 	        slf.addVariables(indexS, equidistantPoints)
 
-        print('\n---------------------- Generating Final ExtraTrees ----- -----------------')
+        print('\n-------------------- Generating Final ExtraTrees ----------------------')
 		# Create final dataset and ExtraTrees
         #Load trainingData and rates
         trainingData=np.loadtxt(slf.trainingFile,skiprows=1,delimiter=',',usecols=np.arange(slf.numberOfInputVariables))
@@ -1028,9 +1064,13 @@ class adaptiveDesignProcedure:
         if(len(queryData.shape) == 1) :
             queryData = queryData.reshape(-1,1)
         
-        pred = 10**slf.reg.predict(queryData)
+        pred = slf.reg.predict(queryData)
         if(len(pred.shape) == 1) :
             pred = pred.reshape(-1,1)
+        
+        for k in range(slf.numberOfTabVariables) :
+            if (slf.typevarTabVar[k] == 'log') : 
+                pred[:,k] = 10**pred[:,k]
         
         pred = slf.scalerout.inverse_transform(pred)
 
@@ -1043,11 +1083,11 @@ class adaptiveDesignProcedure:
 
             err = np.abs(rateDI[idx1]-rateRF[idx1])/np.abs(rateDI[idx1])
 
-            print ('\n * Variables:', slf.headersTabVar[index],'----------------------------------------')  
+            print ('\n * Variables:', slf.headersTabVar[index])  
             print ('    * Av. Benchmark error   : ',np.average(err)*100.,'%')
             print ('    * Max. Benchmark error  : ',np.max(err)*100.,'%')             
 
-        print('\n * Procedure stats:')
+        print('\n--------------------------- Procedure stats ---------------------------\n')
         if(slf.benchmark) :
             print('    * Benchmark error evolution:',slf.benchmarkErrorEv)
         print('    * Training data size evolution:',slf.trainingDataSize)
