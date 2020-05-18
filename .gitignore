@@ -2,7 +2,7 @@
 *.tif
 *.pkl
 
-adaptiveDesignProcedure.egg-info /
+adaptiveDesignProcedure.egg-info/
 build/
 figures/
 tmp/
