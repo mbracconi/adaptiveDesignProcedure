@@ -8,7 +8,11 @@ A design procedure of the training data for Machine Learning algorithms able to 
 ## Installation:
 Clone the repository:
 ```
-git clone https://github.com/mbracconi/adaptiveDesignProcedure
+git clone https://github.com/mbracconi/adaptiveDesignProcedure.git
+```
+Change directory:
+```
+cd adaptiveDesignProcedure
 ```
 
 ## Reference & How to cite:
@@ -19,7 +23,7 @@ M. Bracconi and M. Maestri, "Training set design for Machine Learning techniques
 Run in a terminal main.py to reproduce "Showcase of the procedure" (Section 4.1) of M. Bracconi & M. Maestri, Chemical Engineering Journal, 2020, DOI: 10.1016/j.cej.2020.125469
 
 ## **Requirements:**
-* numPy
-* sciPy
-* matplotlib
-* scikit-learn
+* [numpy](https://numpy.org/)
+* [scipy](https://www.scipy.org/)
+* [matplotlib](https://matplotlib.org/)
+* [scikit-learn](https://scikit-learn.org/stable/)
