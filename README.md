@@ -32,14 +32,23 @@ To uninstall the package you have to rerun the installation and record the insta
 
 ## Documentation :
 **adaptiveDesignProcedure** uses [Sphinx](http://www.sphinx-doc.org/en/stable/) for code documentation. To build the html versions of the docs simply:
-
 ```bash
 > cd docs
 > make html
 ```
 
 ## Example:
-Run in a terminal example.py to reproduce "Showcase of the procedure" (Section 4.1) of M. Bracconi & M. Maestri, Chemical Engineering Journal, 2020, DOI: 10.1016/j.cej.2020.125469
+As an example, the "Showcase of the procedure" (Section 4.1 - M. Bracconi & M. Maestri, Chemical Engineering Journal, 2020, DOI: 10.1016/j.cej.2020.125469) is provided in this repository.
+
+Open a terminal and go to example directory:
+```bash
+> cd example
+```
+
+Run the example:
+```bash
+> python example.py
+```
 
 ## **Requirements:**
 * [numpy](https://numpy.org/)
