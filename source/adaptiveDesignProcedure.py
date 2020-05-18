@@ -84,45 +84,72 @@ class adaptiveDesignProcedure:
         ----------
             in_variables : tuple[dictionary]
                 Dictionaries for each independent species reporting: 'name' -> variable name, 'min_range' -> minimum value,'max_range' -> maximum value, 'num' -> number of points, 'typevar' -> type of variable (log,lin,inv)
-                example:
-                input_var = ( 
-                              { 'name' : 'A', 'min' : 1e-3, 'max' : 1, 'num' : 4, 'typevar' : 'lin'},
-                              { 'name' : 'B', 'min' : 1e-3, 'max' : 1, 'num' : 3, 'typevar' : 'log'}
-                            )
+                
+					example:
+
+					input_var = ( 
+					
+									{ 'name' : 'A', 'min' : 1e-3, 'max' : 1, 'num' : 4, 'typevar' : 'lin'},
+								  
+									{ 'name' : 'B', 'min' : 1e-3, 'max' : 1, 'num' : 3, 'typevar' : 'log'}
+								  
+								)           
             out_variables : tuple[dictionary]
                 Dictionaries for each tabulation species reporting: 'name' -> variable name, 'typevar' -> type of variable (log,lin)
-                example:
-                out_variables = (  
-                                  {'name' : 'R_A', 'typevar' : 'lin'},
-                                  {'name' : 'R_B', 'typevar' : 'lin'},
-                                )
+                
+					example:
+					
+					out_variables = (  
+					
+										{'name' : 'R_A', 'typevar' : 'lin'},
+										
+										{'name' : 'R_B', 'typevar' : 'lin'},
+										
+									)
             forestFile : string
                 Path to ExtraTress final trained algorithm
             trainingFile : string
                 Path to training data file 
             forestParam : dictionary
                 Structure with ExtraTrees parameters
-                example:
-                    forestParams=
-                    {
-                        'Ntree'       : 200, # number of decision trees in the forest
-                        'tps'         : 1,   # number of record in terminal leaves
-                        'fraction'    : 0.7, # fraction of data used to grow the forest
-                    }
+					
+					forestParams =
+					
+						{
+						
+							'Ntree'       : 200, # number of decision trees in the forest
+							
+							'tps'         : 1,   # number of record in terminal leaves
+							
+							'fraction'    : 0.7, # fraction of data used to grow the forest
+							
+						}
+						
             algorithmParam : dictionary
                 Structure with Adaptive Design Procedure parameters
-                example:
-                    algorithmParams=
-                    {
-                        'dth'         : 0.1,     # thresold first derivative
-                        'd2th'        : 0.9,     # thresold second derivative
-                        'VIth'        : 0.15,    # thresold variable importance
-                        'errTh'       : 1e-6,    # thresold for MRE error evaluation (remove from MRE calculation record below this value)
-                        'OOBth'       : 0.05,    # termination criterium on OOBnorm
-                        'RADth'       : 10,      # termination criterium on Relative Approximation Error (RAD) [%]
-                        'maxTDSize'   : 40000,   # maximum allowed size of the training data
-                        'AbsOOBTh'    : 0.2,     # maximum variations between OOB for two different tabulation variables
-                    }
+                					
+                    algorithmParams = 
+                    
+						{
+							
+							'dth'         : 0.1,     # thresold first derivative 
+							
+							'd2th'        : 0.9,     # thresold second derivative
+							
+							'VIth'        : 0.15,    # thresold variable importance
+							
+							'errTh'       : 1e-6,    # thresold for MRE error evaluation (remove from MRE calculation record below this value)
+							
+							'OOBth'       : 0.05,    # termination criterium on OOBnorm
+							
+							'RADth'       : 10,      # termination criterium on Relative Approximation Error (RAD) [%]
+							
+							'maxTDSize'   : 40000,   # maximum allowed size of the training data
+							
+							'AbsOOBTh'    : 0.2,     # maximum variations between OOB for two different tabulation variables
+							
+						}
+						
             queryFile : string, optional
                 Path to the query file (input variables)
             queryTabVar : string, optional

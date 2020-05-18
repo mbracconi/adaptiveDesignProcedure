@@ -14,8 +14,8 @@
 #
 import os
 import sys
-pmutt_path = os.path.join(os.path.dirname(__file__), '../../')
-sys.path.insert(0, os.path.abspath(pmutt_path))
+adp_path = os.path.join(os.path.dirname(__file__), '../../source')
+sys.path.insert(0, os.path.abspath(adp_path))
 
 # -- Project information -----------------------------------------------------
 

@@ -53,6 +53,8 @@ import adaptiveDesignProcedure as adp
 import time
 import sys
 
+# Parameters to reproduce "Showcase of the procedure" (Section 4.1) of M. Bracconi & M. Maestri, Chemical Engineering Journal, 2020, DOI: 10.1016/j.cej.2020.125469
+
 # Forest paramters
 forestParams={
         'Ntree'       : 200,
