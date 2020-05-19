@@ -31,7 +31,7 @@ To uninstall the package you have to rerun the installation and record the insta
 ```
 
 ## Documentation :
-**adaptiveDesignProcedure** uses [Sphinx](http://www.sphinx-doc.org/en/stable/) for code documentation. To build the html versions of the docs simply:
+**adaptiveDesignProcedure** uses [Sphinx](http://www.sphinx-doc.org/en/stable/) for code documentation. To build the html versions of the docs simply type:
 ```bash
 > cd docs
 > make html
@@ -49,6 +49,8 @@ Run the example:
 ```bash
 > python example.py
 ```
+
+At the end of the execution, the results of the adaptive procedure are present in the folder.
 
 ## **Requirements:**
 * [numpy](https://numpy.org/)
