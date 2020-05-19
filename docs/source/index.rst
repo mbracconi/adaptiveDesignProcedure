@@ -18,20 +18,29 @@ Installation
 The official distribution is on GitHub, and you can clone the repository using:
 ::
 
-    git clone https://github.com/mathLab/PyDMD
+    git clone https://github.com/mbracconi/adaptiveDesignProcedure.git
     
 Change directory:
 ::
 
 	cd adaptiveDesignProcedure
 
+To install the package type:
+::
 
-The **adaptiveDesignProcedure** class is in the adaptiveDesignProcedure.py file
+	python setup.py install
+
+
+To uninstall the package you have to rerun the installation and record the installed files in order to remove them:
+::
+
+	python setup.py install --record installed_files.txt
+	pcat installed_files.txt | xargs rm -rf
 
 API Reference
 --------------------
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    adaptiveDesignProcedure
 

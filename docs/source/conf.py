@@ -14,7 +14,7 @@
 #
 import os
 import sys
-adp_path = os.path.join(os.path.dirname(__file__), '../../source')
+adp_path = os.path.join(os.path.dirname(__file__), '../../adpativeDesignProcedure')
 sys.path.insert(0, os.path.abspath(adp_path))
 
 # -- Project information -----------------------------------------------------
@@ -24,7 +24,7 @@ copyright = '2020, Mauro Bracconi'
 author = 'Mauro Bracconi'
 
 # The full version, including alpha/beta/rc tags
-release = '1.0'
+release = '1.3'
 
 
 # -- General configuration ---------------------------------------------------

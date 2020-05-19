@@ -61,9 +61,9 @@ from sklearn.metrics import mean_squared_error
 
 class adaptiveDesignProcedure:
     def __init__(slf,  in_variables, 
-					   tab_variables, 
-					   forestFile, 
-					   trainingFile,
+                       tab_variables, 
+                       forestFile, 
+                       trainingFile,
                        forestParams, 
                        algorithmParams, 
                        approxFunction,
@@ -71,7 +71,7 @@ class adaptiveDesignProcedure:
                        queryTabVar = None, 
                        benchmark = True, 
                        debug = False ):
-						   
+
         """Class constructor
         
         Parameters
@@ -143,8 +143,8 @@ class adaptiveDesignProcedure:
 							'AbsOOBTh'    : 0.2,     # maximum variations between OOB for two different tabulation variables
 							
 						}
-			
-			approxFunction : function
+        
+            approxFunction : function
                 Function which provides the values needed to generate the dataset and the Machine Lerning Model. The function takes one argument which is the matrix of the input file to be computed with shape (number of records, number of in variables) and return a matrix of the function values with shape (number of records, number of tabulation variables)
             queryFile : string, optional
                 Path to the query file (input variables)
@@ -216,8 +216,8 @@ class adaptiveDesignProcedure:
         # Define lists of procedure results
         slf.benchmarkErrorEv    = [] # [iter 0 CO, iter 1 CO, ..., iter 0 H2O, iter 1 H2O, ... ]
         slf.trainingDataSize    = []
-        slf.normOOB             = [] # [ [OOB #0, OOB #1, .... OOB #N], [OOB #0, OOB #1, .... OOB #N], [OOB #0, OOB #1, .... OOB #N], ...] #lista di liste
-        slf.RAD                 = [] # [ [RAD #1, .... RAD #N], [RAD #1, .... RAD #N], [RAD #1, .... RAD #N], ...] lista di liste
+        slf.normOOB             = [] # [ [OOB #0, OOB #1, .... OOB #N], [OOB #0, OOB #1, .... OOB #N], [OOB #0, OOB #1, .... OOB #N], ...] # list of lists
+        slf.RAD                 = [] # [ [RAD #1, .... RAD #N], [RAD #1, .... RAD #N], [RAD #1, .... RAD #N], ...] # list of lists
         
         # Construct and set Random Forest 
         slf.reg = ExtraTreesRegressor(random_state=10, n_estimators=slf.forestParams['Ntree'], max_features="auto", bootstrap = True, oob_score = True, max_samples = slf.forestParams['fraction'], min_samples_leaf=slf.forestParams['tps'])

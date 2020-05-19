@@ -2,6 +2,11 @@
 *.tif
 *.pkl
 *.dat
+*.txt
+
+example/*.dat
+example/*.tif
+example/*.pkl
 
 adaptiveDesignProcedure.egg-info/
 build/
