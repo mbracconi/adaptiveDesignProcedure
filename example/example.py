@@ -29,32 +29,40 @@
     |------------------------------------------------------------------|
     |                                                                  |
     |   Description:                                                   |
-    |       Python class implementing the Adaptive Refinment           |
-    |       Procedure for Machine Learning using ExtraTress            |
-    |       and derivative-based addition of new points                |   
-    |                                                                  |
-    |   Version:                                                       |
-    |       * 1.0 (02/10/2020): adaptive refinement procedure          |
-    |       * 1.1 (04/08/2020): added MinMax scaling of tabulation     |
-    |                           variables                              |
-    |       * 1.2 (05/09/2020): added control on second derivative     |
-    |                           to improve description around          |
-    |                           stationary points                      |
+    |       Example of adaptiveDesign procedure reproducing "Showcase  |
+    |       of the procedure"                                          |
     |                                                                  |
     \*----------------------------------------------------------------*/
 """
 
 import numpy as np
-import os
-import matplotlib.pyplot as plt
-import pylab
-import math
 import adaptiveDesignProcedure as adp
-import time
-import sys
+
+## Function which evaluates the values of the function to be tabulated
+
+def getRate(x):
+    """Compute the function value 
+        
+        Parameters
+        ----------
+            x : np.array[number records, number input variables]
+                Input data
+            
+        Return
+        ----------
+            y : np.array[number records, number tabulation variables]
+                Function values
+                
+    """
+    x = x.reshape(-1,1)
+
+    u = 150
+	
+    y = 1/(1+np.exp(-u*(x-0.5)))*(1/(x**1))+1
+    return y.reshape(-1,1)
+
 
 # Parameters to reproduce "Showcase of the procedure" (Section 4.1) of M. Bracconi & M. Maestri, Chemical Engineering Journal, 2020, DOI: 10.1016/j.cej.2020.125469
-
 # Forest paramters
 forestParams={
         'Ntree'       : 200,
@@ -97,6 +105,7 @@ adpML = adp.adaptiveDesignProcedure(input_var,
                                     trainingFile, 
                                     forestParams, 
                                     algorithmParams, 
+                                    getRate,
                                     queryFile, 
                                     queryRest)
 

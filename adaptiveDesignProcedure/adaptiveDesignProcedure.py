@@ -39,6 +39,8 @@
     |       * 1.2 (05/09/2020): added control on second derivative     |
     |                           to improve description around          |
     |                           stationary points                      |
+    |       * 1.3 (05/19/2020): added external function call to        |
+    |                           compute values                         |
     |                                                                  |
     \*----------------------------------------------------------------*/
 """
@@ -56,23 +58,15 @@ from sklearn.inspection import permutation_importance
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
 
-def getRate(press):
-    pA = press[:,0]
-		
-    z = pA
-    u = 150
-	
-    rate = 1/(1+np.exp(-u*(z-0.5)))*(1/(z**1))+1
-    return rate.reshape(-1,1)
-
 
 class adaptiveDesignProcedure:
-    def __init__(slf, in_variables, 
+    def __init__(slf,  in_variables, 
 					   tab_variables, 
 					   forestFile, 
 					   trainingFile,
                        forestParams, 
                        algorithmParams, 
+                       approxFunction,
                        queryFile = None, 
                        queryTabVar = None, 
                        benchmark = True, 
@@ -149,7 +143,9 @@ class adaptiveDesignProcedure:
 							'AbsOOBTh'    : 0.2,     # maximum variations between OOB for two different tabulation variables
 							
 						}
-						
+			
+			approxFunction : function
+                Function which provides the values needed to generate the dataset and the Machine Lerning Model. The function takes one argument which is the matrix of the input file to be computed with shape (number of records, number of in variables) and return a matrix of the function values with shape (number of records, number of tabulation variables)
             queryFile : string, optional
                 Path to the query file (input variables)
             queryTabVar : string, optional
@@ -178,6 +174,8 @@ class adaptiveDesignProcedure:
         slf.numberOfInputVariables   = len(in_variables)
         slf.numberOfSpecies          = slf.numberOfInputVariables
         slf.numberOfTabVariables     = len(tab_variables)
+        
+        slf.approxFunction = rateFunction
         
         slf.headersInVar = []
         slf.typevarInVar = []
@@ -219,7 +217,7 @@ class adaptiveDesignProcedure:
         slf.benchmarkErrorEv    = [] # [iter 0 CO, iter 1 CO, ..., iter 0 H2O, iter 1 H2O, ... ]
         slf.trainingDataSize    = []
         slf.normOOB             = [] # [ [OOB #0, OOB #1, .... OOB #N], [OOB #0, OOB #1, .... OOB #N], [OOB #0, OOB #1, .... OOB #N], ...] #lista di liste
-        slf.RAD                 = [] # [ [RAD #1, .... RAD #N], [RAD #1, .... RAD #N], [RAD #1, .... RAD #N], ...] #lista di liste
+        slf.RAD                 = [] # [ [RAD #1, .... RAD #N], [RAD #1, .... RAD #N], [RAD #1, .... RAD #N], ...] lista di liste
         
         # Construct and set Random Forest 
         slf.reg = ExtraTreesRegressor(random_state=10, n_estimators=slf.forestParams['Ntree'], max_features="auto", bootstrap = True, oob_score = True, max_samples = slf.forestParams['fraction'], min_samples_leaf=slf.forestParams['tps'])
@@ -848,7 +846,7 @@ class adaptiveDesignProcedure:
             # Compute new training points
             ratesAll = []
             rates = []
-            kmcTime = time.time()
+            funcEvalTime = time.time()
             if count > 0 :
                 print ('      New points            :', str(trainingData.shape[0]-trD.shape[0]), '\n')
                 added   = []
@@ -858,10 +856,10 @@ class adaptiveDesignProcedure:
                 cont = 0            
                 
                 # if number of processes is not specified, it uses the number of core
-                kmcTime = time.time()
+                funcEvalTime = time.time()
 
                 # Get rates
-                ratesAll = np.array(getRate(trainingData)) 
+                ratesAll = np.array(slf.approxFunction(trainingData)) 
                 if(ratesAll.shape[1] != slf.numberOfTabVariables) :
                     print ('\nFATAL ERROR: shape of tabulation variable matrix is wrong, obtained:',ratesAll.shape[1],'expected:', slf.numberOfTabVariables)
                     exit()
@@ -876,7 +874,7 @@ class adaptiveDesignProcedure:
                 elif (slf.typevarTabVar[indexTabVariable] == 'lin') :
                     rates = np.abs(rates).ravel()
                     
-                print ('      MK solved in', str(time.time()-kmcTime))
+                print ('      MK solved in', str(time.time()-funcEvalTime))
 
                 for kk, gg in enumerate(trainingData) :
                     index = np.where(np.all((trD[:,0:slf.numberOfInputVariables] == gg),axis=1) == True)[0]
@@ -929,13 +927,11 @@ class adaptiveDesignProcedure:
                     elif (slf.typevarTabVar[indexTabVariable] == 'lin') :
                         rates = np.abs(rates).ravel()
                    
-                    print ('\n      MK loaded in', str(time.time()-kmcTime))
+                    print ('\n      MK loaded in', str(time.time()-funcEvalTime))
                     
                 else :
                     # First species
-                    #for gg in trainingData :
-                    #    ratesAll.append(getRate(np.expand_dims(gg,1).transpose()))
-                    ratesAll = getRate(trainingData) #ratesAll = pool.map(getRate, ( (np.expand_dims(gg,1)).transpose() for gg in trainingData) )
+                    ratesAll = slf.approxFunction(trainingData) 
                     
                     if(ratesAll.shape[1] != slf.numberOfTabVariables) :
                         print ('\nFATAL ERROR: shape of tabulation variable matrix is wrong, obtained:',ratesAll.shape[1],'expected:', slf.numberOfTabVariables)
@@ -951,7 +947,7 @@ class adaptiveDesignProcedure:
                         rates = np.abs(rates).ravel()
                         
                     np.savetxt('train_'+str(count)+'_'+slf.headersInVar[indexTabVariable]+'.dat',np.c_[trainingData,slf.scalerout.inverse_transform(rates.reshape(-1,1)).ravel()],header=str(slf.headersInVar),comments='#')
-                    print ('\n      MK solved in', str(time.time()-kmcTime))
+                    print ('\n      MK solved in', str(time.time()-funcEvalTime))
                     
 
             # Creo training data
@@ -1096,7 +1092,7 @@ class adaptiveDesignProcedure:
                 
 
     def createTrainingDataAndML(slf, equidistantPoints = 0):
-        """Generate the training set by means of the adaptive design procedure, train and save on forestFile the final ExtraTrees with all the rates and signs
+        """Generate the training set by means of the adaptive design procedure, train and save on forestFile the final ExtraTrees with all the rates and signs. Final ExtraTrees is saved according to forestFile variable in joblib format
 
         """
         print('\n------------------ Iterative Species Points Addition ------------------')
@@ -1114,7 +1110,7 @@ class adaptiveDesignProcedure:
             rates = rates.reshape(-1,1)
             
         plotData=np.c_[trainingData, rates]
-        np.savetxt('plotDataFinal.dat',plotData,delimiter='\t',header=str(slf.headersInVar)) 
+        np.savetxt('plotDataFinal.dat',plotData,delimiter='    ',header=str(slf.headersInVar)) 
         
         slf.scalerout.fit(rates)
         rates=slf.scalerout.transform(rates)
@@ -1202,7 +1198,7 @@ class adaptiveDesignProcedure:
                 query_set = np.append(query_set, pi, axis = 1)
         
         # Compute benchmark
-        query_val = getRate(query_set)
+        query_val = slf.approxFunction(query_set)
         
         for i in range(slf.numberOfInputVariables) :
             if (slf.typevarInVar[i] == 'log') :

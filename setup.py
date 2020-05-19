@@ -16,7 +16,7 @@ description = (
 )
 
 setup(name='adaptiveDesignProcedure',
-	  version='0.0.1',
+	  version='1.3.0',
 	  description='adaptiveDesignProcedure',
 	  long_description=description,
 	  classifiers=[

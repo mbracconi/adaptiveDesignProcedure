@@ -1,6 +1,7 @@
 *.pyc
 *.tif
 *.pkl
+*.dat
 
 adaptiveDesignProcedure.egg-info/
 build/
