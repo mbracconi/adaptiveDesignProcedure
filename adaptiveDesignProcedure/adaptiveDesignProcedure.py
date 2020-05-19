@@ -79,70 +79,70 @@ class adaptiveDesignProcedure:
             in_variables : tuple[dictionary]
                 Dictionaries for each independent species reporting: 'name' -> variable name, 'min_range' -> minimum value,'max_range' -> maximum value, 'num' -> number of points, 'typevar' -> type of variable (log,lin,inv)
                 
-					example:
+                    example:
 
-					input_var = ( 
-					
-									{ 'name' : 'A', 'min' : 1e-3, 'max' : 1, 'num' : 4, 'typevar' : 'lin'},
-								  
-									{ 'name' : 'B', 'min' : 1e-3, 'max' : 1, 'num' : 3, 'typevar' : 'log'}
-								  
-								)           
+                    input_var = ( 
+                    
+                                    { 'name' : 'A', 'min' : 1e-3, 'max' : 1, 'num' : 4, 'typevar' : 'lin'},
+                                  
+                                    { 'name' : 'B', 'min' : 1e-3, 'max' : 1, 'num' : 3, 'typevar' : 'log'}
+                                  
+                                )           
             out_variables : tuple[dictionary]
                 Dictionaries for each tabulation species reporting: 'name' -> variable name, 'typevar' -> type of variable (log,lin)
                 
-					example:
-					
-					out_variables = (  
-					
-										{'name' : 'R_A', 'typevar' : 'lin'},
-										
-										{'name' : 'R_B', 'typevar' : 'lin'},
-										
-									)
+                    example:
+                    
+                    out_variables = (  
+                    
+                                        {'name' : 'R_A', 'typevar' : 'lin'},
+                                        
+                                        {'name' : 'R_B', 'typevar' : 'lin'},
+                                        
+                                    )
             forestFile : string
                 Path to ExtraTress final trained algorithm
             trainingFile : string
                 Path to training data file 
             forestParam : dictionary
                 Structure with ExtraTrees parameters
-					
-					forestParams =
-					
-						{
-						
-							'Ntree'       : 200, # number of decision trees in the forest
-							
-							'tps'         : 1,   # number of record in terminal leaves
-							
-							'fraction'    : 0.7, # fraction of data used to grow the forest
-							
-						}
-						
+                    
+                    forestParams =
+                    
+                        {
+                        
+                            'Ntree'       : 200, # number of decision trees in the forest
+                            
+                            'tps'         : 1,   # number of record in terminal leaves
+                            
+                            'fraction'    : 0.7, # fraction of data used to grow the forest
+                            
+                        }
+                        
             algorithmParam : dictionary
                 Structure with Adaptive Design Procedure parameters
-                					
+                                    
                     algorithmParams = 
                     
-						{
-							
-							'dth'         : 0.1,     # thresold first derivative 
-							
-							'd2th'        : 0.9,     # thresold second derivative
-							
-							'VIth'        : 0.15,    # thresold variable importance
-							
-							'errTh'       : 1e-6,    # thresold for MRE error evaluation (remove from MRE calculation record below this value)
-							
-							'OOBth'       : 0.05,    # termination criterium on OOBnorm
-							
-							'RADth'       : 10,      # termination criterium on Relative Approximation Error (RAD) [%]
-							
-							'maxTDSize'   : 40000,   # maximum allowed size of the training data
-							
-							'AbsOOBTh'    : 0.2,     # maximum variations between OOB for two different tabulation variables
-							
-						}
+                        {
+                            
+                            'dth'         : 0.1,     # thresold first derivative 
+                            
+                            'd2th'        : 0.9,     # thresold second derivative
+                            
+                            'VIth'        : 0.15,    # thresold variable importance
+                            
+                            'errTh'       : 1e-6,    # thresold for MRE error evaluation (remove from MRE calculation record below this value)
+                            
+                            'OOBth'       : 0.05,    # termination criterium on OOBnorm
+                            
+                            'RADth'       : 10,      # termination criterium on Relative Approximation Error (RAD) [%]
+                            
+                            'maxTDSize'   : 40000,   # maximum allowed size of the training data
+                            
+                            'AbsOOBTh'    : 0.2,     # maximum variations between OOB for two different tabulation variables
+                            
+                        }
         
             approxFunction : function
                 Function which provides the values needed to generate the dataset and the Machine Lerning Model. The function takes one argument which is the matrix of the input file to be computed with shape (number of records, number of in variables) and return a matrix of the function values with shape (number of records, number of tabulation variables)
@@ -458,7 +458,7 @@ class adaptiveDesignProcedure:
         
         if(len(ratesDI.shape) == 1) :
             ratesDI = ratesDI.reshape(-1,1)
-			
+            
         if(len(queryData.shape) == 1) :
             queryData = queryData.reshape(-1,1)
         
@@ -480,7 +480,7 @@ class adaptiveDesignProcedure:
             plt.xlim(np.min(pline),np.max(pline))
             plt.ylim(np.min(pline),np.max(pline))
            
-			
+            
             plt.plot(ratesDI[:,k],pred[:,k], 'o', markersize=3)
             plt.ylabel(slf.headersTabVar[k] + r'$\mathregular{_{ET}}$')
             plt.xlabel(slf.headersTabVar[k] + r'$\mathregular{_{MD}}$')
@@ -490,7 +490,7 @@ class adaptiveDesignProcedure:
             plt.legend(slf.headersTabVar, loc='center left', bbox_to_anchor=(1, 0.5))
             plt.xticks(ticks)
             plt.yticks(ticks)
-			
+            
             plt.tight_layout()
             plt.savefig('figures/parity_'+slf.headersTabVar[k]+'.tif', dpi=600, pil_kwargs={"compression": "tiff_lzw"})
 
@@ -574,7 +574,7 @@ class adaptiveDesignProcedure:
                     point_len = len(p_temp_fi)
                     
                     for k in range(point_len) :
-						
+                        
                         if (slf.typevarInVar[j] == 'log') :
                             derj = np.abs(((p_temp_si[k,slf.numberOfInputVariables]) - (p_temp_fi[k,slf.numberOfInputVariables]))/(np.log10(p_unique[i+1])-np.log10(p_unique[i])))
                         elif (slf.typevarInVar[j] == 'lin') :
@@ -730,7 +730,7 @@ class adaptiveDesignProcedure:
             equidistantPoints : int, optional
                 Number of points in each direction of an optional evenly-distributed grid
         """
-		
+        
         print('\n  * Tabulation Variables:',slf.headersTabVar[indexTabVariable])
 
         imp = np.zeros([10,slf.numberOfInputVariables])
@@ -1057,7 +1057,7 @@ class adaptiveDesignProcedure:
                             maxPreviousOOB = max(maxPreviousOOB,slf.normOOB[k][-1])
                         if slf.debug :
                             print('          MaxOld OOB:',maxPreviousOOB)
-						 
+                         
                         if OOBspecies[-1] < maxPreviousOOB or np.abs(OOBspecies[-1] - maxPreviousOOB)/maxPreviousOOB < slf.algorithmParams['AbsOOBTh'] :  #se OOB è minore degli altri ->OK ma consì non fosse guarda quanto distante è OOB dal precedente e se sotto un thresold accetta la differenza
                             iterate = False
                             slf.normOOB.append(OOBspecies)
@@ -1098,10 +1098,10 @@ class adaptiveDesignProcedure:
         print('\n------------------ Iterative Species Points Addition ------------------')
         # Create the training set by adaptive and iterative refinement
         for indexS in range(slf.numberOfTabVariables):
-	        slf.addVariables(indexS, equidistantPoints)
+            slf.addVariables(indexS, equidistantPoints)
 
         print('\n-------------------- Generating Final ExtraTrees ----------------------')
-		# Create final dataset and ExtraTrees
+        # Create final dataset and ExtraTrees
         #Load trainingData and rates
         trainingData=np.loadtxt(slf.trainingFile,skiprows=1,delimiter=',',usecols=np.arange(slf.numberOfInputVariables))
         rates=np.loadtxt('rates.dat',skiprows=1,delimiter=',')
