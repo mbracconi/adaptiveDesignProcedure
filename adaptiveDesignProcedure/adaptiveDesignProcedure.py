@@ -88,7 +88,6 @@ class adaptiveDesignProcedure:
                                     { 'name' : 'B', 'min' : 1e-3, 'max' : 1, 'num' : 3, 'typevar' : 'log'}
                                   
                                 )  
-                                         
             out_variables : tuple[dictionary]
                 Dictionaries for each tabulation species reporting: 'name' -> variable name, 'typevar' -> type of variable (log,lin)
                 
