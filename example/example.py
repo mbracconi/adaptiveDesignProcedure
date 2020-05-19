@@ -112,7 +112,7 @@ adpML = adp.adaptiveDesignProcedure(input_var,
 # Create benchmark dataset (optional)
 adpML.createBenchmarkDataset(query_p)
 
-# Crate training and RF
+# Create training and RF
 adpML.createTrainingDataAndML()
 
 
