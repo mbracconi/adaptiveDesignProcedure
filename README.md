@@ -13,24 +13,42 @@ M. Bracconi and M. Maestri, "Training set design for Machine Learning techniques
 ## Installation:
 Clone the repository:
 ```bash
-git clone https://github.com/mbracconi/adaptiveDesignProcedure.git
+> git clone https://github.com/mbracconi/adaptiveDesignProcedure.git
 ```
 Change directory:
 ```bash
-cd adaptiveDesignProcedure
+> cd adaptiveDesignProcedure
 ```
-The **adaptiveDesignProcedure** class is in the adaptiveDesignProcedure.py file
+To install the package type:
+```bash
+> python setup.py install
+```
+
+To uninstall the package you have to rerun the installation and record the installed files in order to remove them:
+```bash
+> python setup.py install --record installed_files.txt
+> cat installed_files.txt | xargs rm -rf
+```
 
 ## Documentation :
 **adaptiveDesignProcedure** uses [Sphinx](http://www.sphinx-doc.org/en/stable/) for code documentation. To build the html versions of the docs simply:
-
 ```bash
 > cd docs
 > make html
 ```
 
 ## Example:
-Run in a terminal example.py to reproduce "Showcase of the procedure" (Section 4.1) of M. Bracconi & M. Maestri, Chemical Engineering Journal, 2020, DOI: 10.1016/j.cej.2020.125469
+As an example, the "Showcase of the procedure" (Section 4.1 - M. Bracconi & M. Maestri, Chemical Engineering Journal, 2020, DOI: 10.1016/j.cej.2020.125469) is provided in this repository.
+
+Open a terminal and go to example directory:
+```bash
+> cd example
+```
+
+Run the example:
+```bash
+> python example.py
+```
 
 ## **Requirements:**
 * [numpy](https://numpy.org/)
