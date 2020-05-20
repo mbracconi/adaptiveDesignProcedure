@@ -1,12 +1,16 @@
 .. adaptiveDesignTrainingPoints documentation master file, created by
    sphinx-quickstart on Wed Apr  1 09:45:23 2020.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
 
-Welcome to adaptiveDesignProcedure's documentation!
+adaptiveDesignProcedure documentation!
 ========================================================
 
 A design procedure of the training data for Machine Learning algorithms able to iteratively add datapoints according to function discrete gradient.
+
+.. image:: img/GA.png
+   :width: 560px
+   :height: 300px
+   :alt: graphical abstract
+   :align: center
 
 Reference & How to cite
 ------------------------
