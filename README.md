@@ -2,6 +2,12 @@
 
 A design procedure of the training data for Machine Learning algorithms able to iteratively add datapoints according to function discrete gradient.
 
+<p align="center">
+  <a href="http://https://github.com/mbracconi/adaptiveDesignProcedure" target="_blank" >
+    <img alt="adaptiveDesignProcedure" src="docs/source/img/GA.png" width="400" />
+  </a>
+</p>
+
 ## Reference & How to cite:
 Most of the theoretical aspects behind **adaptiveDesignProcedure** are reported in:
 
