@@ -70,6 +70,7 @@ class adaptiveDesignProcedure:
                        queryFile = None, 
                        queryTabVar = None, 
                        benchmark = True, 
+                       plot = True,
                        debug = False ):
 
         """Class constructor
@@ -152,6 +153,8 @@ class adaptiveDesignProcedure:
                 Path to the query file (output variables)
             benchmark : bool, optional
                 Calculation of benchmark error and plotting
+            plot : bool, optional
+                Plot parity and benchmark error during iterative procedure
             debug : bool, optional
                 Print additional information during the iterations
         """
@@ -169,13 +172,14 @@ class adaptiveDesignProcedure:
         slf.queryFile          = queryFile
         slf.queryTabVar        = queryTabVar
         slf.debug              = debug
+        slf.plot               = plot
         
         # Define variables name, legnth and size
         slf.numberOfInputVariables   = len(in_variables)
         slf.numberOfSpecies          = slf.numberOfInputVariables
         slf.numberOfTabVariables     = len(tab_variables)
         
-        slf.approxFunction = rateFunction
+        slf.approxFunction = approxFunction
         
         slf.headersInVar = []
         slf.typevarInVar = []
@@ -226,15 +230,16 @@ class adaptiveDesignProcedure:
         slf.scalerout = MinMaxScaler(feature_range=(1e-6,1))
         
         # For plotting purpose
-        slf.fig = plt.figure(figsize=(10,4))
-        slf.ax = slf.fig.subplots(nrows=1, ncols=2)
-        plt.subplots_adjust(wspace=0.5,bottom = 0.2,right=0.85)
-        # Panel - 1: Average benchmakrj error evolution wrt training points size
-        slf.ax[0].set_ylabel(r'Average benchmark error [%]')
-        slf.ax[0].set_xlabel(r'Number of training points [-]')
-        # Panel - 2: Parity plot
-        slf.ax[1].set_ylabel(r'Rate ET [kmol $\mathregular{m^{-2} s^{-1}}$]')
-        slf.ax[1].set_xlabel(r'Rate MK [kmol $\mathregular{m^{-2} s^{-1}}$]')
+        if(slf.plot == True) :
+            slf.fig = plt.figure(figsize=(10,4))
+            slf.ax = slf.fig.subplots(nrows=1, ncols=2)
+            plt.subplots_adjust(wspace=0.5,bottom = 0.2,right=0.85)
+            # Panel - 1: Average benchmakrj error evolution wrt training points size
+            slf.ax[0].set_ylabel(r'Average benchmark error [%]')
+            slf.ax[0].set_xlabel(r'Number of training points [-]')
+            # Panel - 2: Parity plot
+            slf.ax[1].set_ylabel(r'ET [kmol $\mathregular{m^{-2} s^{-1}}$]')
+            slf.ax[1].set_xlabel(r'Full Model [kmol $\mathregular{m^{-2} s^{-1}}$]')
         
         # Create supporting folders
         if os.path.exists('tmp') :
@@ -483,7 +488,7 @@ class adaptiveDesignProcedure:
             
             plt.plot(ratesDI[:,k],pred[:,k], 'o', markersize=3)
             plt.ylabel(slf.headersTabVar[k] + r'$\mathregular{_{ET}}$')
-            plt.xlabel(slf.headersTabVar[k] + r'$\mathregular{_{MD}}$')
+            plt.xlabel(slf.headersTabVar[k] + r'$\mathregular{_{full model}}$')
             plt.plot(pline,pline,'k-',linewidth=1)
             plt.plot(pline,pline*0.7,'k--',linewidth=0.5)
             plt.plot(pline,pline*1.3,'k--',linewidth=0.5)
@@ -1024,7 +1029,8 @@ class adaptiveDesignProcedure:
                 
                 slf.benchmarkErrorEv.append(np.average(errMRE)*100.)
                 slf.trainingDataSize.append(trainingData.shape[0])
-                slf.plotTrends(indexTabVariable,count,slf.typevarTabVar[indexTabVariable])
+                if(slf.plot) :
+                    slf.plotTrends(indexTabVariable,count,slf.typevarTabVar[indexTabVariable])
 
             # Exit strategy : max counts 8 | approx error < 5 %
             if equidistantPoints == 0 :
