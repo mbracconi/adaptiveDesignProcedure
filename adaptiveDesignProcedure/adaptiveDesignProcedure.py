@@ -517,8 +517,7 @@ class adaptiveDesignProcedure:
             newPressures : np.array
                 Positions of the new points
         """
-        newPressures = []
-        
+        newPressures = []      
         firstDerivative = []
         secondDerivative = []
             
