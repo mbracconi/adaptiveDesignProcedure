@@ -919,7 +919,7 @@ class adaptiveDesignProcedure:
                 addedSup = np.append(addedSup, slf.scalerout.inverse_transform(addedra), axis=1)
                 
                 # Print on file the values of the new training points (just for nice pictures)
-                np.savetxt('train_'+str(count)+'_'+slf.headersInVar[indexTabVariable]+'.dat',addedSup,header=str(slf.headersInVar),comments='#') 
+                np.savetxt('train_'+str(count)+'_'+slf.headersTabVar[indexTabVariable]+'.dat',addedSup,header=str(slf.headersInVar),comments='#') 
                 
             else:
                 if indexTabVariable != 0 :
@@ -951,7 +951,7 @@ class adaptiveDesignProcedure:
                     elif (slf.typevarTabVar[indexTabVariable] == 'lin') :
                         rates = np.abs(rates).ravel()
                         
-                    np.savetxt('train_'+str(count)+'_'+slf.headersInVar[indexTabVariable]+'.dat',np.c_[trainingData,slf.scalerout.inverse_transform(rates.reshape(-1,1)).ravel()],header=str(slf.headersInVar),comments='#')
+                    np.savetxt('train_'+str(count)+'_'+slf.headersTabVar[indexTabVariable]+'.dat',np.c_[trainingData,slf.scalerout.inverse_transform(rates.reshape(-1,1)).ravel()],header=str(slf.headersInVar),comments='#')
                     print ('\n      MK solved in', str(time.time()-funcEvalTime))
                     
 
@@ -1017,10 +1017,9 @@ class adaptiveDesignProcedure:
             if count > 0 :
                 print ('          Iterative approx err : ', errA, '%')
                 
-            # Load rates from query file as real value     
-            ratesDI = np.loadtxt(slf.queryTabVar, skiprows=1,delimiter=',',usecols=(indexTabVariable)) 
-
             if (slf.benchmark) :
+				# Load rates from query file as real value     
+                ratesDI = np.loadtxt(slf.queryTabVar, skiprows=1,delimiter=',',usecols=(indexTabVariable)) 
                 errMSLE = slf.benchmarkError(indexTabVariable,slf.typevarTabVar[indexTabVariable],count,msle=True)
                 errMRE = slf.benchmarkError(indexTabVariable,slf.typevarTabVar[indexTabVariable],count,msle=False)
                 print ('\n      Benchmark calculations:')
