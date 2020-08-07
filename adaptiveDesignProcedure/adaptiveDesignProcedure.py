@@ -946,21 +946,22 @@ class adaptiveDesignProcedure:
                     slf.scalerout.fit(rates.reshape(-1,1))
                     rates=slf.scalerout.transform(rates.reshape(-1,1))
                     if (slf.typevarTabVar[indexTabVariable] == 'log') : 
+                        np.savetxt('train_'+str(count)+'_'+slf.headersTabVar[indexTabVariable]+'.dat',np.c_[trainingData,slf.scalerout.inverse_transform(rates.reshape(-1,1)).ravel()],header=str(slf.headersInVar),comments='#')
                         rates = np.log10(np.abs(rates)).ravel() 
                     elif (slf.typevarTabVar[indexTabVariable] == 'lin') :
+                        np.savetxt('train_'+str(count)+'_'+slf.headersTabVar[indexTabVariable]+'.dat',np.c_[trainingData,slf.scalerout.inverse_transform(rates.reshape(-1,1)).ravel()],header=str(slf.headersInVar),comments='#')
                         rates = np.abs(rates).ravel()
                         
-                    np.savetxt('train_'+str(count)+'_'+slf.headersTabVar[indexTabVariable]+'.dat',np.c_[trainingData,slf.scalerout.inverse_transform(rates.reshape(-1,1)).ravel()],header=str(slf.headersInVar),comments='#')
                     print ('\n      MK solved in', str(time.time()-funcEvalTime))
                     
 
-            # Creo training data
+            # Build training data
             rates=np.expand_dims(rates,1)
             rates_plot=np.expand_dims(rates_plot,1)
             
-            trainingData = np.append(trainingData, rates, axis=1) # aggiungo valore assoluto della rate in logscale
+            trainingData = np.append(trainingData, rates, axis=1) 
             
-            # Creo training data per ExtraTrees
+            # Build training data for ExtraTrees
             trainingDataSupp = np.empty((trainingData.shape[0],slf.numberOfInputVariables))
             for k in range(slf.numberOfInputVariables) :
                 if (slf.typevarInVar[k] == 'log') :
@@ -978,10 +979,9 @@ class adaptiveDesignProcedure:
             if (count > 0) :
                 np.savetxt('rates.dat',ratesAll,delimiter=',',header=str(slf.headersTabVar)) 
 
-            # Ranger grow forest (done 10 times to get a less biased OOB especially in the case of small dataset)
+            # Train forest (done 10 times to get a less biased OOB especially in the case of small dataset)
             OOB = []
-            # Ranger grow forest (done 10 times to get a less biased OOB especially in the case of small dataset)
-            
+ 
             for k in range(10) :
                 slf.trainExtraTressMISO(trainingDataSupp)
                 
@@ -989,10 +989,7 @@ class adaptiveDesignProcedure:
                 OOB.append(mean_squared_error(trainingDataSupp[:,-1],slf.reg.oob_prediction_))
                                 
                 # Store Variable importance
-                imp[k,:] = np.array(permutation_importance(slf.reg,trainingDataSupp[:,0:slf.numberOfInputVariables],trainingDataSupp[:,-1],n_repeats=10,scoring='r2').importances_mean) #np.array(slf.reg.feature_importances_) 
-                #print ('\n      Gini variable importance:', imp[k,:])
-                #print(np.array(permutation_importance(slf.reg,trainingDataSupp[:,0:slf.numberOfInputVariables],trainingDataSupp[:,-1],n_repeats=10,scoring='r2').importances_mean))
-                
+                imp[k,:] = np.array(permutation_importance(slf.reg,trainingDataSupp[:,0:slf.numberOfInputVariables],trainingDataSupp[:,-1],n_repeats=10,scoring='r2').importances_mean) 
             
             OOB = np.mean(np.array(OOB))  
             
@@ -1017,7 +1014,7 @@ class adaptiveDesignProcedure:
                 print ('          Iterative approx err : ', errA, '%')
                 
             if (slf.benchmark) :
-				# Load rates from query file as real value     
+                # Load rates from query file as real value     
                 ratesDI = np.loadtxt(slf.queryTabVar, skiprows=1,delimiter=',',usecols=(indexTabVariable)) 
                 errMSLE = slf.benchmarkError(indexTabVariable,slf.typevarTabVar[indexTabVariable],count,msle=True)
                 errMRE = slf.benchmarkError(indexTabVariable,slf.typevarTabVar[indexTabVariable],count,msle=False)
