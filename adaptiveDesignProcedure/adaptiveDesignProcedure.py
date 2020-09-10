@@ -46,7 +46,9 @@
 """
 
 import numpy as np
+import matplotlib as mpl
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mtick
 import os
 import shutil
 import time
@@ -240,6 +242,7 @@ class adaptiveDesignProcedure:
             # Panel - 2: Parity plot
             slf.ax[1].set_ylabel(r'ET [kmol $\mathregular{m^{-2} s^{-1}}$]')
             slf.ax[1].set_xlabel(r'Full Model [kmol $\mathregular{m^{-2} s^{-1}}$]')
+            #slf.ax[1].ticklabel_format(axis = 'both', style = 'sci', useOffset=False)
         
         # Create supporting folders
         if os.path.exists('tmp') :
@@ -423,7 +426,7 @@ class adaptiveDesignProcedure:
         plt.pause(0.001)
         
         pline=np.array([np.min(ratesDI[idx1])*0.8,np.max(ratesDI[idx1])*1.2])
-        ticks = np.linspace(np.min(pline),np.max(pline),6)
+        ticks = np.linspace(np.min(pline),np.max(pline),4)
         if(iterC == 0) :
             plt.sca(slf.ax[1])
             plt.cla()
@@ -434,15 +437,18 @@ class adaptiveDesignProcedure:
             slf.ax[1].plot(pline,pline*1.3,'k--',linewidth=0.5)
             plt.xticks(ticks)
             plt.yticks(ticks)
+            plt.gca().yaxis.set_major_formatter(mtick.FormatStrFormatter('%.1e')) 
+            plt.gca().xaxis.set_major_formatter(mtick.FormatStrFormatter('%.1e'))
 
         slf.ax[1].plot(ratesDI[idx1],pred[idx1], 'o', markersize=3,label = slf.headersTabVar[indexTabVariable] + ' - #' + str(iterC))
         slf.ax[1].set_ylabel(slf.headersTabVar[indexTabVariable] + r'$\mathregular{_{ET}}$')
         slf.ax[1].set_xlabel(slf.headersTabVar[indexTabVariable] + r'$\mathregular{_{MD}}$')
         plt.sca(slf.ax[1])
         slf.ax[1].legend(loc='center left', bbox_to_anchor=(1, 0.5))
+        
         plt.draw()
         plt.pause(0.001)
-        plt.savefig('figures/trend_'+slf.headersInVar[indexTabVariable]+'_'+str(iterC)+'.tif', dpi=600)
+        plt.savefig('figures/trend_'+slf.headersTabVar[indexTabVariable]+'_'+str(iterC)+'.tif', dpi=600)
 
     def plotParity(slf) :
         """Plot parity plot with ExtraTrees obtained at the end of the procedure
@@ -481,7 +487,7 @@ class adaptiveDesignProcedure:
         for k in range(slf.numberOfTabVariables) :
             plt.figure()
             pline=np.array([min(np.min(ratesDI[:,k]),np.min(pred))*0.8,max(np.max(ratesDI[:,k]),np.max(pred))*1.2])
-            ticks = np.linspace(np.min(pline),np.max(pline),6)
+            ticks = np.linspace(np.min(pline),np.max(pline),4)
             plt.xlim(np.min(pline),np.max(pline))
             plt.ylim(np.min(pline),np.max(pline))
            
@@ -492,9 +498,11 @@ class adaptiveDesignProcedure:
             plt.plot(pline,pline,'k-',linewidth=1)
             plt.plot(pline,pline*0.7,'k--',linewidth=0.5)
             plt.plot(pline,pline*1.3,'k--',linewidth=0.5)
-            plt.legend(slf.headersTabVar, loc='center left', bbox_to_anchor=(1, 0.5))
+            plt.legend([slf.headersTabVar[k]], loc='center left', bbox_to_anchor=(1, 0.5))
             plt.xticks(ticks)
             plt.yticks(ticks)
+            plt.gca().yaxis.set_major_formatter(mtick.FormatStrFormatter('%.1e'))
+            plt.gca().xaxis.set_major_formatter(mtick.FormatStrFormatter('%.1e'))
             
             plt.tight_layout()
             plt.savefig('figures/parity_'+slf.headersTabVar[k]+'.tif', dpi=600, pil_kwargs={"compression": "tiff_lzw"})
@@ -517,7 +525,8 @@ class adaptiveDesignProcedure:
             newPressures : np.array
                 Positions of the new points
         """
-        newPressures = []      
+        newPressures = []
+        
         firstDerivative = []
         secondDerivative = []
             
@@ -763,7 +772,7 @@ class adaptiveDesignProcedure:
                     pi = 1./np.linspace(1./slf.max_range[i],1./slf.min_range[i], num=equidistantPoints)
                 p_var.append(pi)
                 
-            pointsPerSpec = [equidistantPoints]*len(slf.numberOfInputVariables)
+            pointsPerSpec = [equidistantPoints]*(slf.numberOfInputVariables)
 
         else :
             if indexTabVariable == 0:   
@@ -855,7 +864,7 @@ class adaptiveDesignProcedure:
                 print ('      New points            :', str(trainingData.shape[0]-trD.shape[0]), '\n')
                 added   = []
                 addedra = []
-                addedrs = []    
+                    
                 ratesAll = []
                 cont = 0            
                 
@@ -884,7 +893,7 @@ class adaptiveDesignProcedure:
                     index = np.where(np.all((trD[:,0:slf.numberOfInputVariables] == gg),axis=1) == True)[0]
 
                     if len(index) == 0 :
-                        addedra.append(rates[kk])
+                        addedra.append(rates_plot[kk])
                         added.append(gg)
                         cont += 1
                                 
@@ -913,9 +922,9 @@ class adaptiveDesignProcedure:
             
                 addedSup = queryDataVal
                 addedra = np.array(addedra)
-                addedrs = np.array(addedrs)
+                
                 addedra = np.expand_dims(addedra,1)
-                addedSup = np.append(addedSup, slf.scalerout.inverse_transform(addedra), axis=1)
+                addedSup = np.append(addedSup, addedra, axis=1)
                 
                 # Print on file the values of the new training points (just for nice pictures)
                 np.savetxt('train_'+str(count)+'_'+slf.headersTabVar[indexTabVariable]+'.dat',addedSup,header=str(slf.headersInVar),comments='#') 
@@ -923,6 +932,7 @@ class adaptiveDesignProcedure:
             else:
                 if indexTabVariable != 0 :
                     rates=np.loadtxt('rates.dat',skiprows=1,delimiter=',',usecols=(indexTabVariable))
+                    ratesAll = np.loadtxt('rates.dat',skiprows=1,delimiter=',')
                     rates_plot = rates
                     slf.scalerout.fit(rates.reshape(-1,1))
                     rates=slf.scalerout.transform(rates.reshape(-1,1))
@@ -943,6 +953,7 @@ class adaptiveDesignProcedure:
                     ratesAll = np.array(ratesAll)
                     rates = ratesAll[:,indexTabVariable]
                     rates_plot = rates
+                 
                     slf.scalerout.fit(rates.reshape(-1,1))
                     rates=slf.scalerout.transform(rates.reshape(-1,1))
                     if (slf.typevarTabVar[indexTabVariable] == 'log') : 
@@ -951,17 +962,16 @@ class adaptiveDesignProcedure:
                     elif (slf.typevarTabVar[indexTabVariable] == 'lin') :
                         np.savetxt('train_'+str(count)+'_'+slf.headersTabVar[indexTabVariable]+'.dat',np.c_[trainingData,slf.scalerout.inverse_transform(rates.reshape(-1,1)).ravel()],header=str(slf.headersInVar),comments='#')
                         rates = np.abs(rates).ravel()
-                        
                     print ('\n      MK solved in', str(time.time()-funcEvalTime))
                     
 
-            # Build training data
+            # Creo training data
             rates=np.expand_dims(rates,1)
             rates_plot=np.expand_dims(rates_plot,1)
+                        
+            trainingData = np.append(trainingData, rates, axis=1) # aggiungo valore assoluto della rate in logscale
             
-            trainingData = np.append(trainingData, rates, axis=1) 
-            
-            # Build training data for ExtraTrees
+            # Creo training data per ExtraTrees
             trainingDataSupp = np.empty((trainingData.shape[0],slf.numberOfInputVariables))
             for k in range(slf.numberOfInputVariables) :
                 if (slf.typevarInVar[k] == 'log') :
@@ -976,12 +986,13 @@ class adaptiveDesignProcedure:
 
             #write training file(for both training datasets)
             np.savetxt(slf.trainingFile,trainingDataSupp,delimiter=',',header=str(slf.headersInVar)) 
-            if (count > 0) :
+            if (count > 0 or equidistantPoints) :
                 np.savetxt('rates.dat',ratesAll,delimiter=',',header=str(slf.headersTabVar)) 
 
-            # Train forest (done 10 times to get a less biased OOB especially in the case of small dataset)
+            # Ranger grow forest (done 10 times to get a less biased OOB especially in the case of small dataset)
             OOB = []
- 
+            # Ranger grow forest (done 10 times to get a less biased OOB especially in the case of small dataset)
+            
             for k in range(10) :
                 slf.trainExtraTressMISO(trainingDataSupp)
                 
@@ -989,7 +1000,10 @@ class adaptiveDesignProcedure:
                 OOB.append(mean_squared_error(trainingDataSupp[:,-1],slf.reg.oob_prediction_))
                                 
                 # Store Variable importance
-                imp[k,:] = np.array(permutation_importance(slf.reg,trainingDataSupp[:,0:slf.numberOfInputVariables],trainingDataSupp[:,-1],n_repeats=10,scoring='r2').importances_mean) 
+                imp[k,:] = np.array(permutation_importance(slf.reg,trainingDataSupp[:,0:slf.numberOfInputVariables],trainingDataSupp[:,-1],n_repeats=10,scoring='r2').importances_mean) #np.array(slf.reg.feature_importances_) 
+                #print ('\n      Gini variable importance:', imp[k,:])
+                #print(np.array(permutation_importance(slf.reg,trainingDataSupp[:,0:slf.numberOfInputVariables],trainingDataSupp[:,-1],n_repeats=10,scoring='r2').importances_mean))
+                
             
             OOB = np.mean(np.array(OOB))  
             
@@ -1013,9 +1027,11 @@ class adaptiveDesignProcedure:
             if count > 0 :
                 print ('          Iterative approx err : ', errA, '%')
                 
+            # Load rates from query file as real value     
+            #ratesDI = np.loadtxt(slf.queryTabVar, skiprows=1,delimiter=',',usecols=(indexTabVariable)) 
+
             if (slf.benchmark) :
-                # Load rates from query file as real value     
-                ratesDI = np.loadtxt(slf.queryTabVar, skiprows=1,delimiter=',',usecols=(indexTabVariable)) 
+                ratesDI = np.loadtxt(slf.queryTabVar, skiprows=1,delimiter=',',usecols=(indexTabVariable))
                 errMSLE = slf.benchmarkError(indexTabVariable,slf.typevarTabVar[indexTabVariable],count,msle=True)
                 errMRE = slf.benchmarkError(indexTabVariable,slf.typevarTabVar[indexTabVariable],count,msle=False)
                 print ('\n      Benchmark calculations:')
@@ -1117,9 +1133,9 @@ class adaptiveDesignProcedure:
         rates=slf.scalerout.transform(rates)
         for k in range(slf.numberOfTabVariables) :
             if (slf.typevarTabVar[k] == 'log') : 
-                rates[:,k] = np.log10(np.abs(rates)).ravel() 
+                rates[:,k] = np.log10(np.abs(rates[:,k])).ravel() 
             elif (slf.typevarTabVar[k] == 'lin') :
-                rates[:,k] = np.abs(rates).ravel()
+                rates[:,k] = np.abs(rates[:,k]).ravel()
 
         #Construct trainingData for all species
         trainingData=np.c_[trainingData, rates]
