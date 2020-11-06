@@ -47,6 +47,7 @@
 
 import numpy as np
 import matplotlib as mpl
+mpl.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 import os
@@ -585,9 +586,7 @@ class adaptiveDesignProcedure:
                     locder = []
                    
                     point_len = len(p_temp_fi)
-                    
                     for k in range(point_len) :
-                        
                         if (slf.typevarInVar[j] == 'log') :
                             derj = np.abs(((p_temp_si[k,slf.numberOfInputVariables]) - (p_temp_fi[k,slf.numberOfInputVariables]))/(np.log10(p_unique[i+1])-np.log10(p_unique[i])))
                         elif (slf.typevarInVar[j] == 'lin') :
@@ -968,7 +967,7 @@ class adaptiveDesignProcedure:
             # Creo training data
             rates=np.expand_dims(rates,1)
             rates_plot=np.expand_dims(rates_plot,1)
-                        
+             
             trainingData = np.append(trainingData, rates, axis=1) # aggiungo valore assoluto della rate in logscale
             
             # Creo training data per ExtraTrees
@@ -1039,9 +1038,11 @@ class adaptiveDesignProcedure:
                 print ('          Max. Benchmark error     : ',np.max(errMRE)*100.,'%')
                 
                 slf.benchmarkErrorEv.append(np.average(errMRE)*100.)
-                slf.trainingDataSize.append(trainingData.shape[0])
+                #slf.trainingDataSize.append(trainingData.shape[0])
                 if(slf.plot) :
                     slf.plotTrends(indexTabVariable,count,slf.typevarTabVar[indexTabVariable])
+
+            slf.trainingDataSize.append(trainingData.shape[0])
 
             # Exit strategy : max counts 8 | approx error < 5 %
             if equidistantPoints == 0 :
@@ -1150,37 +1151,38 @@ class adaptiveDesignProcedure:
         joblib.dump([slf.reg, slf.scalerout], slf.forestFile)
 
         #PredictionVSQuery
-        ratesDI =np.loadtxt(slf.queryTabVar,skiprows=1,delimiter=',')
-        if(len(ratesDI.shape) == 1) :
-            ratesDI = ratesDI.reshape(-1,1)
+        if(slf.benchmark) :
+            ratesDI =np.loadtxt(slf.queryTabVar,skiprows=1,delimiter=',')
+            if(len(ratesDI.shape) == 1) :
+                ratesDI = ratesDI.reshape(-1,1)
                    
-        queryData = np.loadtxt(slf.queryFile, skiprows=1, delimiter=',')
+            queryData = np.loadtxt(slf.queryFile, skiprows=1, delimiter=',')
         
-        if(len(queryData.shape) == 1) :
-            queryData = queryData.reshape(-1,1)
+            if(len(queryData.shape) == 1) :
+                queryData = queryData.reshape(-1,1)
         
-        pred = slf.reg.predict(queryData)
-        if(len(pred.shape) == 1) :
-            pred = pred.reshape(-1,1)
+            pred = slf.reg.predict(queryData)
+            if(len(pred.shape) == 1) :
+                pred = pred.reshape(-1,1)
         
-        for k in range(slf.numberOfTabVariables) :
-            if (slf.typevarTabVar[k] == 'log') : 
-                pred[:,k] = 10**pred[:,k]
+            for k in range(slf.numberOfTabVariables) :
+                if (slf.typevarTabVar[k] == 'log') : 
+                    pred[:,k] = 10**pred[:,k]
         
-        pred = slf.scalerout.inverse_transform(pred)
+            pred = slf.scalerout.inverse_transform(pred)
 
         
-        for index in range(slf.numberOfTabVariables):
-            rateDI = ratesDI[:,index]
-            rateRF = pred[:,index]  
+            for index in range(slf.numberOfTabVariables):
+                rateDI = ratesDI[:,index]
+                rateRF = pred[:,index]  
 
-            idx1 = np.where(np.abs(rateDI) >= slf.algorithmParams['errTh'])
+                idx1 = np.where(np.abs(rateDI) >= slf.algorithmParams['errTh'])
 
-            err = np.abs(rateDI[idx1]-rateRF[idx1])/np.abs(rateDI[idx1])
+                err = np.abs(rateDI[idx1]-rateRF[idx1])/np.abs(rateDI[idx1])
 
-            print ('\n * Variables:', slf.headersTabVar[index])  
-            print ('    * Av. Benchmark error   : ',np.average(err)*100.,'%')
-            print ('    * Max. Benchmark error  : ',np.max(err)*100.,'%')             
+                print ('\n * Variables:', slf.headersTabVar[index])  
+                print ('    * Av. Benchmark error   : ',np.average(err)*100.,'%')
+                print ('    * Max. Benchmark error  : ',np.max(err)*100.,'%')             
 
         print('\n--------------------------- Procedure stats ---------------------------\n')
         if(slf.benchmark) :
