@@ -47,7 +47,6 @@
 
 import numpy as np
 import matplotlib as mpl
-mpl.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 import os
@@ -1038,7 +1037,7 @@ class adaptiveDesignProcedure:
                 print ('          Max. Benchmark error     : ',np.max(errMRE)*100.,'%')
                 
                 slf.benchmarkErrorEv.append(np.average(errMRE)*100.)
-                #slf.trainingDataSize.append(trainingData.shape[0])
+                slf.trainingDataSize.append(trainingData.shape[0])
                 if(slf.plot) :
                     slf.plotTrends(indexTabVariable,count,slf.typevarTabVar[indexTabVariable])
 
