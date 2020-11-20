@@ -505,7 +505,7 @@ class adaptiveDesignProcedure:
             plt.gca().xaxis.set_major_formatter(mtick.FormatStrFormatter('%.1e'))
             
             plt.tight_layout()
-            plt.savefig('figures/parity_'+slf.headersTabVar[k]+'.tif', dpi=600, pil_kwargs={"compression": "tiff_lzw"})
+            plt.savefig('figures/parity_'+slf.headersTabVar[k]+'.tif', dpi=600)
 
 
 
