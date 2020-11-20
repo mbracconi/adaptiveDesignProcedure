@@ -1028,6 +1028,7 @@ class adaptiveDesignProcedure:
             # Load rates from query file as real value     
             #ratesDI = np.loadtxt(slf.queryTabVar, skiprows=1,delimiter=',',usecols=(indexTabVariable)) 
 
+			slf.trainingDataSize.append(trainingData.shape[0])
             if (slf.benchmark) :
                 ratesDI = np.loadtxt(slf.queryTabVar, skiprows=1,delimiter=',',usecols=(indexTabVariable))
                 errMSLE = slf.benchmarkError(indexTabVariable,slf.typevarTabVar[indexTabVariable],count,msle=True)
@@ -1037,11 +1038,8 @@ class adaptiveDesignProcedure:
                 print ('          Max. Benchmark error     : ',np.max(errMRE)*100.,'%')
                 
                 slf.benchmarkErrorEv.append(np.average(errMRE)*100.)
-                slf.trainingDataSize.append(trainingData.shape[0])
                 if(slf.plot) :
                     slf.plotTrends(indexTabVariable,count,slf.typevarTabVar[indexTabVariable])
-
-            slf.trainingDataSize.append(trainingData.shape[0])
 
             # Exit strategy : max counts 8 | approx error < 5 %
             if equidistantPoints == 0 :
