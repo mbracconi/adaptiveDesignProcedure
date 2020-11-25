@@ -1028,7 +1028,7 @@ class adaptiveDesignProcedure:
             # Load rates from query file as real value     
             #ratesDI = np.loadtxt(slf.queryTabVar, skiprows=1,delimiter=',',usecols=(indexTabVariable)) 
 
-			slf.trainingDataSize.append(trainingData.shape[0])
+            slf.trainingDataSize.append(trainingData.shape[0])
             if (slf.benchmark) :
                 ratesDI = np.loadtxt(slf.queryTabVar, skiprows=1,delimiter=',',usecols=(indexTabVariable))
                 errMSLE = slf.benchmarkError(indexTabVariable,slf.typevarTabVar[indexTabVariable],count,msle=True)
