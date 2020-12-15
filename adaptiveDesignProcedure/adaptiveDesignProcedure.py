@@ -7,10 +7,10 @@
     |------------------------------------------------------------------|
     |                                                                  |
     |  Author: Mauro Bracconi                                          |
-    |           mauro.bracconi@polimi.it                               |                         
-    |           Politecnico di Milano                                  |
-    |           Dipartimento di Energia                                |
-    |           Laboratory of Catalysis and Catalytic Processes        |   
+    |          mauro.bracconi@polimi.it                                |                         
+    |          Politecnico di Milano                                   |
+    |          Dipartimento di Energia                                 |
+    |          Laboratory of Catalysis and Catalytic Processes         |   
     |                                                                  |
     |------------------------------------------------------------------|
     |                                                                  |
@@ -41,6 +41,8 @@
     |                           stationary points                      |
     |       * 1.3 (05/19/2020): added external function call to        |
     |                           compute values                         |
+    |       * 1.4 (12/15/2020): improved evaluation of first and       |
+    |                           second derivatives                     |
     |                                                                  |
     \*----------------------------------------------------------------*/
 """
@@ -508,9 +510,8 @@ class adaptiveDesignProcedure:
             plt.savefig('figures/parity_'+slf.headersTabVar[k]+'.tif', dpi=600)
 
 
-
-    ## Function which select the position for the newly added points at each iteration
-    def findPoints(slf, trainData, pointsToAdd):
+        ## Function which select the position for the newly added points at each iteration
+    def findPoints(slf, trainData, pointsToAdd, indexTabVariable):
         """Evaluate the position of the new points based on the discrete function gradient
         
         Parameters
@@ -519,6 +520,8 @@ class adaptiveDesignProcedure:
                 Matrix consisting of the training data variables and function rate
             pointsToAdd : np.array
                 Variables considered for the addition defined based on the variable importance
+            indexTabVariable : int
+                Index of the tabulation variables considered
                 
         Return
         ----------
@@ -542,7 +545,7 @@ class adaptiveDesignProcedure:
             # Create a list which stores the derivatives in each interval
             der = []    
             trer = []
-            trer2 = []
+            # trer2 = []
             
             # Compute the derivatives in each of the interval for direction j
             # Example: 2 species and 3 points per each
@@ -585,13 +588,30 @@ class adaptiveDesignProcedure:
                     locder = []
                    
                     point_len = len(p_temp_fi)
+                    
+                    # Treatment of input var
+                    if (slf.typevarInVar[j] == 'lin') :
+                        distance = p_unique[i+1]-p_unique[i]
+                    elif (slf.typevarInVar[j] == 'log') :
+                        distance = np.log10(p_unique[i+1])-np.log10(p_unique[i])
+                    elif (slf.typevarInVar[j] == 'inv') :
+                        distance = 1./p_unique[i+1]-1./p_unique[i]
+                    
                     for k in range(point_len) :
-                        if (slf.typevarInVar[j] == 'log') :
-                            derj = np.abs(((p_temp_si[k,slf.numberOfInputVariables]) - (p_temp_fi[k,slf.numberOfInputVariables]))/(np.log10(p_unique[i+1])-np.log10(p_unique[i])))
-                        elif (slf.typevarInVar[j] == 'lin') :
-                            derj = np.abs(((p_temp_si[k,slf.numberOfInputVariables]) - (p_temp_fi[k,slf.numberOfInputVariables]))/((p_unique[i+1])-(p_unique[i])))
-                        elif (slf.typevarInVar[j] == 'inv') :
-                            derj = np.abs(((p_temp_si[k,slf.numberOfInputVariables]) - (p_temp_fi[k,slf.numberOfInputVariables]))/(1./p_unique[i+1]-1./p_unique[i]))
+                        
+                        # Treatment of output var
+                        if (slf.typevarTabVar[indexTabVariable] == 'lin'):
+                            valFi = p_temp_fi[k,slf.numberOfInputVariables]
+                            valSi = p_temp_si[k,slf.numberOfInputVariables]
+                        elif (slf.typevarTabVar[indexTabVariable] == 'log'):
+                            valFi = 10**p_temp_fi[k,slf.numberOfInputVariables]
+                            valSi = 10**p_temp_si[k,slf.numberOfInputVariables]
+                            
+                        # Reverse scaling of tabulation variables
+                        valFi = slf.scalerout.inverse_transform(valFi.reshape(1,-1))
+                        valSi = slf.scalerout.inverse_transform(valSi.reshape(1,-1))
+                        
+                        derj = np.abs((valSi - valFi)/distance)
 
                         locder.append(derj)
                     
@@ -606,57 +626,74 @@ class adaptiveDesignProcedure:
                         p_temp_i = trainData[trainData[:,j] == p_unique[i]]
                         p_temp_ip = trainData[trainData[:,j] == p_unique[i+1]]
                         p_temp_im = trainData[trainData[:,j] == p_unique[i-1]]
-                                                
-                        dx1 = p_unique[i]-p_unique[i-1]
-                        dx2 = p_unique[i+1]-p_unique[i]
-                        dx3 = p_unique[i+1]-p_unique[i-1]
                         
-                        locapp = []
-                        locappd2 = []
-                        point_len = len(p_temp_i)
-                        for k in range(point_len) :
+                        # Treatment of input var
+                        if (slf.typevarInVar[j] == 'lin') :
+                            dx1 = p_unique[i]-p_unique[i-1]
+                            dx2 = p_unique[i+1]-p_unique[i]
+                            dx3 = p_unique[i+1]-p_unique[i-1]
+                        elif (slf.typevarInVar[j] == 'log') :
+                            dx1 = np.log10(p_unique[i])-np.log10(p_unique[i-1])
+                            dx2 = np.log10(p_unique[i+1])-np.log10(p_unique[i])
+                            dx3 = np.log10(p_unique[i+1])-np.log10(p_unique[i-1])
+                        elif (slf.typevarInVar[j] == 'inv') :
+                            dx1 = 1./p_unique[i]-1./p_unique[i-1]
+                            dx2 = 1./p_unique[i+1]-1./p_unique[i]
+                            dx3 = 1./p_unique[i+1]-1./p_unique[i-1]
+                            
+                    else :
+                        p_temp_im = trainData[trainData[:,j] == p_unique[i]]
+                        p_temp_i = trainData[trainData[:,j] == p_unique[i+1]]
+                        p_temp_ip = trainData[trainData[:,j] == p_unique[i+2]]
+                        
+                        # Treatment of input var
+                        if (slf.typevarInVar[j] == 'lin') :
+                            dx1 = p_unique[i+1]-p_unique[i]
+                            dx2 = p_unique[i+2]-p_unique[i+1]
+                            dx3 = p_unique[i+2]-p_unique[i]
+                        elif (slf.typevarInVar[j] == 'log') :
+                            dx1 = np.log10(p_unique[i+1])-np.log10(p_unique[i])
+                            dx2 = np.log10(p_unique[i+2])-np.log10(p_unique[i+1])
+                            dx3 = np.log10(p_unique[i+2])-np.log10(p_unique[i])
+                        elif (slf.typevarInVar[j] == 'inv') :
+                            dx1 = 1./p_unique[i+1]-1./p_unique[i]
+                            dx2 = 1./p_unique[i+2]-1./p_unique[i+1]
+                            dx3 = 1./p_unique[i+2]-1./p_unique[i]
+                            
+                    #locapp = []
+                    locappd2 = []
+                    point_len = len(p_temp_i)
+                    for k in range(point_len) :
+                        # Treatment of output var
+                        if (slf.typevarTabVar[indexTabVariable] == 'lin'):
                             a = p_temp_ip[k,slf.numberOfInputVariables]    
                             b = p_temp_i[k,slf.numberOfInputVariables]    
-                            c = p_temp_im[k,slf.numberOfInputVariables]    
-                            
-                            der1jFO = (a-b)/dx2
-                            der1jHO = (a*dx1**2-c*dx2**2+b*(dx1**2-dx2**2))/(dx1*dx2*(dx1+dx2))
-                            der2j = (a*dx1 + c*dx2 - b*dx3)/(0.5*dx1*dx2*dx3);
-                            der2j *= dx2/2.0
-                            
-                            locapp.append(np.abs(der1jHO-der1jFO))
-                            locappd2.append(np.abs(der2j))
+                            c = p_temp_im[k,slf.numberOfInputVariables]  
+                        elif (slf.typevarTabVar[indexTabVariable] == 'log'):
+                            a = 10**p_temp_ip[k,slf.numberOfInputVariables]    
+                            b = 10**p_temp_i[k,slf.numberOfInputVariables]    
+                            c = 10**p_temp_im[k,slf.numberOfInputVariables]
                         
-                        trer.append(np.max(locappd2))
-                        trer2.append(np.max(locapp))
+                         # Reverse scaling of tabulation variables
+                        a = slf.scalerout.inverse_transform(a.reshape(1,-1))
+                        b = slf.scalerout.inverse_transform(b.reshape(1,-1))
+                        c = slf.scalerout.inverse_transform(c.reshape(1,-1))
+   
+                        # Removed the residual function calculation, it is not being used
+                        #der1jFO = (a-b)/dx2
+                        #der1jHO = (a*dx1**2-c*dx2**2+b*(dx1**2-dx2**2))/(dx1*dx2*(dx1+dx2))
                         
-                    else :
-                        p_temp_i = trainData[trainData[:,j] == p_unique[i]]
-                        p_temp_ip = trainData[trainData[:,j] == p_unique[i+1]]
-                        p_temp_ipp = trainData[trainData[:,j] == p_unique[i+2]]
+                        der2j = (a*dx1 + c*dx2 - b*dx3)/(0.5*dx1*dx2*dx3);
                         
-                        dx1 = p_unique[i+1]-p_unique[i]
-                        dx2 = p_unique[i+2]-p_unique[i+1]
-                        dx3 = p_unique[i+2]-p_unique[i]
+                        #######
+                        # Why is this multiplication factor being added?
+                        # der2j *= dx2/2.0
                         
-                        locapp = []
-                        locappd2 = []
-                        point_len = len(p_temp_i)
-                        for k in range(point_len) :
-                            a = p_temp_ipp[k,slf.numberOfInputVariables]    
-                            b = p_temp_ip[k,slf.numberOfInputVariables]    
-                            c = p_temp_i[k,slf.numberOfInputVariables]    
-                        
-                            der1jFO = (b-c)/dx1
-                            der1jHO = (-a*dx1**2+b*dx3**2-c*(dx3**2-dx1**2))/(dx1*dx2*dx3)
-                            
-                            der2j = (a*dx1 + c*dx2 - b*dx3)/(0.5*dx1*dx2*dx3);
-                            der2j *= dx2/2.0
-                            locappd2.append(der2j)
-                            locapp.append(np.abs(der1jHO-der1jFO))
-                            
-                        trer.append(np.max(locappd2))
-                        trer2.append(np.max(locapp))
+                        #locapp.append(np.abs(der1jHO-der1jFO))
+                        locappd2.append(np.abs(der2j))
+                    
+                    trer.append(np.max(locappd2))
+                    #trer2.append(np.max(locapp))
                             
                 # ------------------------------------------------------------------------------------------------------------------
             else :
@@ -666,20 +703,6 @@ class adaptiveDesignProcedure:
             firstDerivative.append(np.abs(der))
             secondDerivative.append(np.abs(trer))
             
-
-        maxDerList = []
-        maxTDerList = []
-        for j in range(slf.numberOfInputVariables):
-            localMax = np.average(firstDerivative[j])
-            maxDerList.append(localMax)
-            localMax = np.max(secondDerivative[j])
-            maxTDerList.append(localMax)
-        
-        maxDerList = np.array(maxDerList)
-        maxDer = np.average(maxDerList)
-        
-        maxTDerList = np.array(maxTDerList)
-        maxTDer = np.max(maxTDerList)
         
         for j in range(slf.numberOfInputVariables):
             # Retrieve the existing intervals
@@ -695,9 +718,6 @@ class adaptiveDesignProcedure:
                 # Compute first derivative in each interval
                 for i in range(n_intervals):
                     
-                    p_temp_fi = trainData[trainData[:,j] == p_unique[i]]
-                    p_temp_si = trainData[trainData[:,j] == p_unique[i+1]]
-            
                     # log average between points for species, normal for temperature
                     if (slf.typevarInVar[j] == 'log') :
                         sp = np.average([np.log10(p_unique[i]),np.log10(p_unique[i+1])])
@@ -716,12 +736,17 @@ class adaptiveDesignProcedure:
                 # Both 1/ and 2/ are normalized respect to the function maximum value
                 der = firstDerivative[j]
                 trer = secondDerivative[j]
+                countDer1 = 0
+                countDer2 = 0
 
                 for i in range(der.shape[0]) :
                     if  np.abs(der[i]/np.max(der)) > slf.algorithmParams['dth'] :
                         poi.append(add_p[i])
+                        countDer1 += 1
                     elif np.abs(trer[i]/np.max(trer)) > slf.algorithmParams['d2th']  :
                         poi.append(add_p[i])
+                        countDer2 += 1
+       
 
                 new_p = np.append(new_p, poi)
                     
@@ -730,7 +755,7 @@ class adaptiveDesignProcedure:
                 newPressures.append(p_unique)
         
         return newPressures
-
+    
     def addVariables(slf,indexTabVariable, equidistantPoints = 0):
         """Adaptively and iteratively add points for each tabulation variables
 
@@ -823,7 +848,7 @@ class adaptiveDesignProcedure:
                     print ('      Normalized variable importance:', ' '.join( str(e) for e in (importances/biggestImp)))
                     
                     
-                    newPress = slf.findPoints(trainingData[:,:], pointsToAdd)
+                    newPress = slf.findPoints(trainingData[:,:], pointsToAdd, indexTabVariable)
                     pointsPerSpec = [len(j) for j in newPress]
                     
                     p_var = []
