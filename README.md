@@ -63,6 +63,7 @@ At the end of the execution, the results of the adaptive procedure are present i
 * [scipy](https://www.scipy.org/)
 * [matplotlib](https://matplotlib.org/)
 * [scikit-learn](https://scikit-learn.org/stable/)
+* [boruta_py](https://github.com/scikit-learn-contrib/boruta_py)
 
 ## **Acknowledgements:**
 * [ERC SHAPE](http://www.shape.polimi.it/) project held by [Prof. Matteo Maestri](http://www.shape.polimi.it/people/matteo-maestri/)
