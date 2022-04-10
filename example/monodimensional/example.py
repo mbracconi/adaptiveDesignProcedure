@@ -67,7 +67,7 @@ def getRate(x):
 forestParams={
         'Ntree'       : 200,
         'tps'         : 1,
-        'fraction'    : 0.9,
+        'fraction'    : 0.7,
     }
 
 # Algorithm paramters

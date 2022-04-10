@@ -37,6 +37,7 @@ setup(name='adaptiveDesignProcedure',
 	  		'scipy',
 	  		'matplotlib',
 	  		'scikit-learn',
+                        'boruta',
 	  		'Sphinx==1.4',
 	  		'sphinx_rtd_theme'
 	  ],
