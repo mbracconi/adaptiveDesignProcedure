@@ -3,6 +3,7 @@
 *.pkl
 *.dat
 *.txt
+*~
 
 example/*.dat
 example/*.tif

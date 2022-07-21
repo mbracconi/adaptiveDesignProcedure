@@ -44,16 +44,24 @@ import shutil
 import time
 import joblib
 
-import itertools
-import scipy.integrate as integ
-from copy import deepcopy
+import logging
 
+import itertools
+
+import sklearn
 from sklearn.ensemble import ExtraTreesRegressor
 from sklearn.inspection import permutation_importance
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
 
 from boruta import BorutaPy
+
+from packaging import version
+
+if(version.parse(sklearn.__version__) >= version.parse('1.1.1')):
+    nfeat=1.0
+else:
+    nfeat='auto'
 #mpl.use('Agg')
 
 class adaptiveDesignProcedure:
@@ -161,7 +169,18 @@ class adaptiveDesignProcedure:
             useBorutaWeak : bool, optional
                 Consider also Boruta's weak variable in the training
         """
-        
+  
+        # Initialize logger
+        logger = logging.getLogger('output_adp')
+        logger.setLevel(logging.INFO)
+        formatter = logging.Formatter('%(message)s')
+        flh = logging.FileHandler('output_adp.log', mode='w', encoding='UTF-8')
+        flh.setFormatter(formatter)
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.INFO)
+        logger.addHandler(ch)
+        logger.addHandler(flh)
+      
         # Assign forest and training data file path
         slf.forestFile         = forestFile
         slf.trainingFile       = 'tmp/'+trainingFile
@@ -200,13 +219,13 @@ class adaptiveDesignProcedure:
             if (spec['name'] == 'T') :
                 slf.numberOfSpecies -= 1
             if(spec['typevar'] != 'log' and spec['typevar'] != 'inv' and spec['typevar'] != 'lin') :
-                print ('\nFATAL ERROR: variable type for',spec['name'],'not supported (log, inv, lin)\n')
+                logger.error('\nFATAL ERROR: variable type for ' + spec['name'] + ' not supported (log, inv, lin)\n')
                 exit()
             if(spec['min'] <= 0) :
-                print ('\nFATAL ERROR: minimum range for',spec['name'],'<= 0\n')
+                logger.error('\nFATAL ERROR: minimum range for ' + spec['name'] + ' <= 0\n')
                 exit()
             if(spec['num'] < 3) :
-                print ('\nFATAL ERROR: minimum number of initial points for',spec['name'],'is 3\n')
+                logger.error('\nFATAL ERROR: minimum number of initial points for ' + spec['name'] + ' is 3\n')
                 exit()
 
         slf.min_range = np.array(slf.min_range)
@@ -219,7 +238,7 @@ class adaptiveDesignProcedure:
             slf.headersTabVar.append(tabv['name'])
             slf.typevarTabVar.append(tabv['typevar'])
             if(tabv['typevar'] != 'log' and tabv['typevar'] != 'lin') :
-                print ('\nFATAL ERROR: variable type for',spec['name'],'not supported (log, lin)\n')
+                logger.error('\nFATAL ERROR: variable type for ' + spec['name'] + ' not supported (log, lin)\n')
                 exit()
         
         # Define lists of procedure results
@@ -231,7 +250,7 @@ class adaptiveDesignProcedure:
         slf.RAD                 = [] # [ [RAD #1, .... RAD #N], [RAD #1, .... RAD #N], [RAD #1, .... RAD #N], ...] # list of lists
         
         # Construct and set Random Forest 
-        slf.reg = ExtraTreesRegressor(random_state=10, n_estimators=slf.forestParams['Ntree'], max_features="auto", bootstrap = True, oob_score = True, max_samples = slf.forestParams['fraction'], min_samples_leaf=slf.forestParams['tps'])
+        slf.reg = ExtraTreesRegressor(random_state=10, n_estimators=slf.forestParams['Ntree'], max_features=nfeat, bootstrap = True, oob_score = True, max_samples = slf.forestParams['fraction'], min_samples_leaf=slf.forestParams['tps'])
        
         # Construct and set the scaler
         slf.scalerout = MinMaxScaler(feature_range=(1e-6,1))
@@ -256,36 +275,36 @@ class adaptiveDesignProcedure:
         if os.path.exists('figures') :
             shutil.rmtree('figures')
         os.mkdir('figures')
-        
+
         # Printing
-        print('\n------ Adaptive generation of Training Data for Machine Learning ------')
-        print('\nInput parameters:')
-        print('  * Forest file:', slf.forestFile)
-        print('  * Training file:', slf.trainingFile)
-        print('  * Figure path:', 'figures')
-        print('  * Plotting enabled:', str(slf.plot))
-        print('  * Boruta as feature selector:', str(slf.useBoruta))
+        logger.info('\n------ Adaptive generation of Training Data for Machine Learning ------')
+        logger.info('\nInput parameters:')
+        logger.info('  * Forest file: ' + slf.forestFile)
+        logger.info('  * Training file: ' + slf.trainingFile)
+        logger.info('  * Figure path: ' + 'figures')
+        logger.info('  * Plotting enabled: ' + str(slf.plot))
+        logger.info('  * Boruta as feature selector: ' + str(slf.useBoruta))
         if (slf.useBoruta):
-            print('  * Use Weak Support Var in Boruta:', str(slf.useBorutaWeak))
-        print('\n  * Forest parameters:')
-        print('    {')
-        print('\n'.join('        {}: {}'.format(k, v) for k, v in forestParams.items()))
-        print('    }')
-        print('\n  * Algorithm parameters:')
-        print('    {')
-        print('\n'.join('        {}: {}'.format(k, v) for k, v in algorithmParams.items()))
-        print('    }')
-        print('\n\n  * Variables information:')
+            logger.info('  * Use Weak Support Var in Boruta:' + str(slf.useBorutaWeak))
+        logger.info('\n  * Forest parameters:')
+        logger.info('    {')
+        logger.info('\n'.join('        {}: {}'.format(k, v) for k, v in forestParams.items()))
+        logger.info('    }')
+        logger.info('\n  * Algorithm parameters:')
+        logger.info('    {')
+        logger.info('\n'.join('        {}: {}'.format(k, v) for k, v in algorithmParams.items()))
+        logger.info('    }')
+        logger.info('\n\n  * Variables information:')
         for t in in_variables :
-            print('    {')
-            print('\n'.join('        {}: {}'.format(k, v) for k, v in t.items()))
-            print('    }')
+            logger.info('    {')
+            logger.info('\n'.join('        {}: {}'.format(k, v) for k, v in t.items()))
+            logger.info('    }')
             
-        print('\n\n  * Tabulation information:')
+        logger.info('\n\n  * Tabulation information:')
         for t in tab_variables :
-            print('    {')
-            print('\n'.join('        {}: {}'.format(k, v) for k, v in t.items()))
-            print('    }')
+            logger.info('    {')
+            logger.info('\n'.join('        {}: {}'.format(k, v) for k, v in t.items()))
+            logger.info('    }')
         
 
     def trainExtraTressMISO(slf,trainingData) :
@@ -723,20 +742,7 @@ class adaptiveDesignProcedure:
             new_p = p_unique
             # Create a empty list with the position of nthe new points
             add_p=[]
-            
-            # #Derivative value tracking
-            # if isinstance(firstDerivative[j], Iterable):
-            #     ## TESTING
-            #     print ('   --------------------------- ')
-            #     print ('   Derivatives of input species: ',j,':', ' '.join( str(e) for e in firstDerivative[j]))
-            #     print ('   ---------------------------')
-            # else:
-            #     print ('   --------------------------- ')
-            #     print ('   Derivatives of input species: ',j,':', firstDerivative[j])
-            #     print ('   ---------------------------')
-            
-            
-            
+           
             if pointsToAdd[j] > 0: 
                 # Compute first derivative in each interval
                 for i in range(n_intervals):
@@ -771,11 +777,11 @@ class adaptiveDesignProcedure:
                         countDer2 += 1
 
                 if(slf.debug):
-                    print ('      --------------------------- ')
-                    print ('      Point addition in direction: ',slf.headersInVar[j])
-                    print ('      Points added through 1st der: ',countDer1)
-                    print ('      Points added through 2nd der: ',countDer2)
-                    print ('      ---------------------------')                
+                    logger.debug ('      --------------------------- ')
+                    logger.debug ('      Point addition in direction: ',slf.headersInVar[j])
+                    logger.debug ('      Points added through 1st der: ',countDer1)
+                    logger.debug ('      Points added through 2nd der: ',countDer2)
+                    logger.debug ('      ---------------------------')                
 
                 new_p = np.append(new_p, poi)
                     
@@ -795,8 +801,8 @@ class adaptiveDesignProcedure:
             equidistantPoints : int, optional
                 Number of points in each direction of an optional evenly-distributed grid
         """
-        
-        print('\n  * Tabulation Variables:',slf.headersTabVar[indexTabVariable])
+        logger = logging.getLogger('output_adp')
+        logger.info('\n  * Tabulation Variables: ' + slf.headersTabVar[indexTabVariable])
 
         imp = np.zeros([10,slf.numberOfInputVariables])
         
@@ -857,15 +863,15 @@ class adaptiveDesignProcedure:
 
         while iterate:
             if equidistantPoints:
-                print ('\n\n\n * Equidistant points ')
+                logger.info ('\n\n\n * Equidistant points ')
                 
                 iterate = False
 
-                print ('   --------------------------- ')
-                print ('   Points per species:', ' '.join( str(e) for e in pointsPerSpec))
-                print ('   ---------------------------')
+                logger.info ('   --------------------------- ')
+                logger.info ('   Points per species: ' + ' '.join( str(e) for e in pointsPerSpec))
+                logger.info ('   ---------------------------')
             else :
-                print ('\n    * Iteration: ',count)
+                logger.info ('\n    * Iteration: ' + str(count))
                 if count > 0:
                     
                     biggestImp  = np.max(importances)
@@ -897,16 +903,16 @@ class adaptiveDesignProcedure:
                     
                     pointsToAdd[locAdd] = 1
 
-                    print ('      Normalized variable importance:', ' '.join( str(e) for e in (importances/biggestImp)))
+                    logger.info ('      Normalized variable importance: ' + ' '.join( str(e) for e in (importances/biggestImp)))
                     
                     if (slf.useBoruta):
-                        print ('\n      Using Boruta for feature selection.')
-                        print ('      Boruta Support: ', [header for index,header in enumerate(slf.headersInVar) if boruta.support_[index]])
-                        print ('      Boruta Support Weak:', [header for index,header in enumerate(slf.headersInVar) if boruta.support_weak_[index]])
+                        logger.info ('\n      Using Boruta for feature selection.')
+                        logger.info ('      Boruta Support: ' + ' '.join(header for index,header in enumerate(slf.headersInVar) if boruta.support_[index]))
+                        logger.info ('      Boruta Support Weak: ' + ' '.join(header for index,header in enumerate(slf.headersInVar) if boruta.support_weak_[index]))
                         if not selectedFeatures:
-                            print ('      Boruta did not select any feature for improvement in this iteration.')
-                            print ('      Forcing feature selection with Variable Importance threshold in this iteration.')
-                        print('\n')
+                            logger.info ('      Boruta did not select any feature for improvement in this iteration.')
+                            logger.info ('      Forcing feature selection with Variable Importance threshold in this iteration.')
+                        logger.info('\n')
                     
                     newPress = slf.findPoints(trainingData[:,:], pointsToAdd, indexTabVariable)
                     pointsPerSpec = [len(j) for j in newPress]
@@ -915,13 +921,13 @@ class adaptiveDesignProcedure:
                     for i in range(slf.numberOfInputVariables) :
                         p_var.append(np.sort(newPress[i]))
 
-                    print ('      --------------------------- ')
-                    print ('      Points per species:', ' '.join( str(e) for e in pointsPerSpec))
-                    print ('      ---------------------------')
+                    logger.info ('      --------------------------- ')
+                    logger.info ('      Points per species :' + ' '.join( str(e) for e in pointsPerSpec))
+                    logger.info ('      ---------------------------')
                 else :
-                    print ('      --------------------------- ')
-                    print ('      Points per species:', ' '.join( str(e) for e in pointsPerSpec))
-                    print ('      ---------------------------')
+                    logger.info ('      --------------------------- ')
+                    logger.info ('      Points per species :' + ' '.join( str(e) for e in pointsPerSpec))
+                    logger.info ('      ---------------------------')
 
             # Store past data for avoid redundant calculations
             if count > 0 :
@@ -937,14 +943,14 @@ class adaptiveDesignProcedure:
             if (len(trainingData.shape) == 1) : # one independent variable
                 trainingData = trainingData.reshape(-1,1)
             
-            print ('      Total number of points: ', str(trainingData.shape[0]))
+            logger.info ('      Total number of points: ' + str(trainingData.shape[0]))
 
             # Compute new training points
             ratesAll = []
             rates = []
             funcEvalTime = time.time()
             if count > 0 :
-                print ('      New points            :', str(trainingData.shape[0]-trD.shape[0]), '\n')
+                logger.info ('      New points            : ' + str(trainingData.shape[0]-trD.shape[0]) + '\n')
                 added   = []
                 addedra = []
                     
@@ -957,12 +963,12 @@ class adaptiveDesignProcedure:
                 # Get rates
                 ratesAll = np.array(slf.approxFunction(trainingData)) 
                 if(ratesAll.shape[1] != slf.numberOfTabVariables) :
-                    print ('\nFATAL ERROR: shape of tabulation variable matrix is wrong, obtained:',ratesAll.shape[1],'expected:', slf.numberOfTabVariables)
+                    logger.error ('\nFATAL ERROR: shape of tabulation variable matrix is wrong, obtained: ' + ratesAll.shape[1] + ' expected: ' + slf.numberOfTabVariables)
                     exit()
                 rates = ratesAll[:,indexTabVariable]
                 rates_plot = rates
                     
-                print ('      Function solved in', str(time.time()-funcEvalTime))
+                logger.info ('      Function solved in ' + str(time.time()-funcEvalTime))
 
                 for kk, gg in enumerate(trainingData) :
                     # Searches for the indexes where the points existed previously to point addition
@@ -1031,14 +1037,14 @@ class adaptiveDesignProcedure:
                     elif (slf.typevarTabVar[indexTabVariable] == 'lin') :
                         rates = rates.ravel()
                    
-                    print ('\n      Function loaded in', str(time.time()-funcEvalTime))
+                    logger.info ('\n      Function loaded in ' + str(time.time()-funcEvalTime))
                     
                 else :
                     # First species
                     ratesAll = slf.approxFunction(trainingData) 
                     
                     if(ratesAll.shape[1] != slf.numberOfTabVariables) :
-                        print ('\nFATAL ERROR: shape of tabulation variable matrix is wrong, obtained:',ratesAll.shape[1],'expected:', slf.numberOfTabVariables)
+                        logger.error ('\nFATAL ERROR: shape of tabulation variable matrix is wrong, obtained: ' + ratesAll.shape[1] + ' expected: ' + slf.numberOfTabVariables)
                         exit()
                         
                     ratesAll = np.array(ratesAll)
@@ -1056,7 +1062,7 @@ class adaptiveDesignProcedure:
                     elif (slf.typevarTabVar[indexTabVariable] == 'lin') :
                         np.savetxt('train_'+str(count)+'_'+slf.headersTabVar[indexTabVariable]+'.dat',np.c_[trainingData,slf.scalerout.inverse_transform(rates.reshape(-1,1)).ravel()],header=str(slf.headersInVar),comments='#')
                         rates = rates.ravel()
-                    print ('\n      Function solved in', str(time.time()-funcEvalTime))
+                    logger.info ('\n      Function solved in ' + str(time.time()-funcEvalTime))
                     
 
             # Create training data
@@ -1118,8 +1124,7 @@ class adaptiveDesignProcedure:
                 boruta.fit(np.array(trainingDataSupp[:,0:slf.numberOfInputVariables]), np.array(trainingDataSupp[:,-1]))
             
             importances=np.mean(imp,axis=0) 
-            if(slf.debug) :
-                print ('\n      VI importance:', importances)
+    
             joblib.dump([slf.reg, slf.scalerout], 'tmp/rf_'+slf.headersTabVar[indexTabVariable]+'_count'+str(count)+'.pkl')
                          
             # Compute the approximation error
@@ -1133,11 +1138,11 @@ class adaptiveDesignProcedure:
             # Add OOB storage list
             OOBspecies.append(OOB)
             slf.OOBScoreEv.append(OOBScore)
-            print ('\n      Approximation quality:')
-            print ('          Out-Of-Bag error     : ', OOB)
-            print ('          Out-Of-Bag score     : ', OOBScore)
+            logger.info ('\n      Approximation quality:')
+            logger.info ('          Out-Of-Bag error     : ' + str(OOB))
+            logger.info ('          Out-Of-Bag score     : ' + str(OOBScore))
             if count > 0 :
-                print ('          Iterative approx err : ', errA, '%')
+                logger.info ('          Iterative approx err : ' + str(errA) + ' %')
                 
             # Load rates from query file as real value     
             #ratesDI = np.loadtxt(slf.queryTabVar, skiprows=1,delimiter=',',usecols=(indexTabVariable))
@@ -1149,12 +1154,10 @@ class adaptiveDesignProcedure:
                 #errMSLE = slf.benchmarkError(indexTabVariable,slf.typevarTabVar[indexTabVariable],count,msle=True, relative = False)
                 #errMRE = slf.benchmarkError(indexTabVariable,slf.typevarTabVar[indexTabVariable],count,msle=False, relative = True)
                 errMAE = slf.benchmarkError(indexTabVariable,slf.typevarTabVar[indexTabVariable],count,msle=False, relative = False)
-                print ('\n      Benchmark calculations:')
-                print ('      Currently saving MAE error')
-                # print ('          Av. Benchmark error (MRE) : ',np.average(errMRE)*100.,'%')           
-                # print ('          Max. Benchmark error (MRE): ',np.max(errMRE)*100.,'%')
-                print ('          Av. Benchmark error (MAE) : ',np.average(errMAE)*100.,'%')           
-                print ('          Max. Benchmark error (MAE): ',np.max(errMAE)*100.,'%')
+                logger.info ('\n      Benchmark calculations:')
+                logger.info ('      Currently saving MAE error')
+                logger.info ('          Av. Benchmark error (MAE) : ' + str(np.average(errMAE)*100.) + ' %')           
+                logger.info ('          Max. Benchmark error (MAE): ' + str(np.max(errMAE)*100.) +' %')
                 
                 slf.benchmarkErrorEv.append(np.average(errMAE)*100.)
                 slf.benchmarkMaxErrorEv.append(np.max(errMAE)*100.)
@@ -1172,34 +1175,35 @@ class adaptiveDesignProcedure:
                         iterate = False
                         slf.normOOB.append(OOBspecies)
                         slf.RAD.append(RADspecies)
-                        print ('\n      Maximum size of training data reached in',count+1,' iterations')
+                        logger.info ('\n      Maximum size of training data reached in ' + str(count+1) + ' iterations')
                         if slf.debug :
-                            print('          OOB Evolution: ',OOBspecies)
-                            print('          RAD Evolution: ',RADspecies) 
+                            logger.debug('          OOB Evolution: ' + ' '.join( str(e) for e in  OOBspecies))
+                            logger.debug('          RAD Evolution: ' + ' '.join( str(e) for e in  RADspecies)) 
                     
                     else :
                         iterate = False
                         slf.normOOB.append(OOBspecies)
                         slf.RAD.append(RADspecies)
-                        print ('\n      Accuracy constraints reached in',count+1,' iterations')
+                        logger.info ('\n      Accuracy constraints reached in ' + str(count+1) + ' iterations')
                         if slf.debug :
-                            print('          OOB Evolution: ',OOBspecies)
-                            print('          RAD Evolution: ',RADspecies)   
+                            logger.debug('          OOB Evolution: ' + ' '.join( str(e) for e in  OOBspecies))
+                            logger.debug('          RAD Evolution: ' + ' '.join( str(e) for e in  RADspecies))
+                           
                 else :
                     if count == 0:
                         maxPreviousOOB = 0.
                         for k in range(indexTabVariable) :
                             maxPreviousOOB = max(maxPreviousOOB,slf.normOOB[k][-1])
                         if slf.debug :
-                            print('          MaxOld OOB:',maxPreviousOOB)
+                            logger.debug('          MaxOld OOB: '+ str(maxPreviousOOB))
                         
                         if OOB < slf.algorithmParams['OOBth']: 
                             iterate = False
                             slf.normOOB.append(OOBspecies)
                             slf.RAD.append([])
-                            print ('\n      Accuracy constraints reached in',count+1,'iterations')
+                            logger.info ('\n      Accuracy constraints reached in ' + str(count+1) + ' iterations')
                             if slf.debug :
-                                print('          OOB Evolution: ',OOBspecies)
+                                logger.debug('          OOB Evolution: ' + ' '.join( str(e) for e in  OOBspecies))
                         else :
                             iterate = True
                             count += 1
@@ -1212,30 +1216,31 @@ class adaptiveDesignProcedure:
                             iterate = False
                             slf.normOOB.append(OOBspecies)
                             slf.RAD.append(RADspecies)
-                            print ('\n      Maximum size of training data reached in',count+1,'iterations')
+                            logger.info ('\n      Maximum size of training data reached in ' + str(count+1) + ' iterations')
                             if slf.debug :
-                                print('          OOB Evolution: ',OOBspecies)
-                                print('          RAD Evolution: ',RADspecies) 
+                                logger.debug('          OOB Evolution: ' + ' '.join( str(e) for e in  OOBspecies))
+                                logger.debug('          RAD Evolution: ' + ' '.join( str(e) for e in  RADspecies))
                         else :
                             iterate = False
                             slf.normOOB.append(OOBspecies)
                             slf.RAD.append(RADspecies)
-                            print ('\n      Accuracy constraints reached in',count+1,'iterations')
+                            logger.info ('\n      Accuracy constraints reached in ' + str(count+1) + ' iterations')
                             if slf.debug :
-                                print('          OOB Evolution: ',OOBspecies)
-                                print('          RAD Evolution: ',RADspecies) 
+                                logger.debug('          OOB Evolution: ' + ' '.join( str(e) for e in  OOBspecies))
+                                logger.debug('          RAD Evolution: ' + ' '.join( str(e) for e in  RADspecies))
                 
 
     def createTrainingDataAndML(slf, equidistantPoints = 0):
         """Generate the training set by means of the adaptive design procedure, train and save on forestFile the final ExtraTrees with all the rates and signs. Final ExtraTrees is saved according to forestFile variable in joblib format
 
-        """
-        print('\n------------------ Iterative Species Points Addition ------------------')
+        """  
+        logger = logging.getLogger('output_adp')
+        logger.info('\n------------------ Iterative Species Points Addition ------------------')
         # Create the training set by adaptive and iterative refinement
         for indexS in range(slf.numberOfTabVariables):
             slf.addVariables(indexS, equidistantPoints)
 
-        print('\n-------------------- Generating Final ExtraTrees ----------------------')
+        logger.info('\n-------------------- Generating Final ExtraTrees ----------------------')
         # Create final dataset and ExtraTrees
         # Load trainingData and rates
         trainingData=np.loadtxt(slf.trainingFile,skiprows=1,delimiter=',',usecols=np.arange(slf.numberOfInputVariables))
@@ -1297,9 +1302,9 @@ class adaptiveDesignProcedure:
 
                 err = np.abs(rateDI[idx1]-rateRF[idx1])/np.abs(np.average(rateDI[idx1]))
 
-                print ('\n * Variables:', slf.headersTabVar[index])  
-                print ('    * Av. Benchmark error   : ',np.average(err)*100.,'%')
-                print ('    * Max. Benchmark error  : ',np.max(err)*100.,'%')          
+                logger.info ('\n * Variables: ' + slf.headersTabVar[index])  
+                logger.info ('    * Av. Benchmark error   : ' + str(np.average(err)*100.) + ' %')
+                logger.info ('    * Max. Benchmark error  : ' + str(np.max(err)*100.) + ' %')          
                 
                 
         # Produces a PKL with only the variable types to allow a more general approach to the
@@ -1318,17 +1323,16 @@ class adaptiveDesignProcedure:
             'types': slf.typevarTabVar
             }
         joblib.dump([slf.reg, slf.scalerout, inpVarParam, tabVarParam], slf.forestFile[0:slf.forestFile.index('.')]+'_forCFD.pkl')
-        print('\n----------------------- Model for CFD generated -----------------------\n')        
-                
-
-        print('\n--------------------------- Procedure stats ---------------------------\n')
+        logger.info('\n----------------------- Model for CFD generated -----------------------\n')        
+        
+        logger.info('\n--------------------------- Procedure stats ---------------------------\n')
+        
         if(slf.benchmark) :
-            print('    * Benchmark error evolution:',slf.benchmarkErrorEv)
+            logger.info('    * Benchmark error evolution: ' + ' '.join( str(e) for e in slf.benchmarkErrorEv))
             if(slf.plot):
                 slf.plotParity()
-        print('    * Training data size evolution:',slf.trainingDataSize)
-        
-        print('\n--------------------------------- end ---------------------------------')
+        logger.info('    * Training data size evolution: ' + ' '.join( str(e) for e in slf.trainingDataSize))
+        logger.info('\n--------------------------------- end ---------------------------------')
         
     def createBenchmarkDataset(slf, num_query):
         """Create a benchmark dataset by repetitively solving the full model
@@ -1338,7 +1342,8 @@ class adaptiveDesignProcedure:
             num_query : int
                 Number of queries where the full model is solved
         """
-        print('\n * Create Benchmark Dataset')
+        logger = logging.getLogger('output_adp')
+        logger.info('\n * Create Benchmark Dataset')
         # Build query dataset input
         query_set = []
         for i in range(slf.numberOfInputVariables) :
