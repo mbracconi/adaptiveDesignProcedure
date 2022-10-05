@@ -1141,7 +1141,7 @@ class adaptiveDesignProcedure:
             if (slf.useBoruta):
                 boruta = BorutaPy(
                    # estimator = slf.reg,
-                   estimator = ExtraTreesRegressor(random_state=10, n_estimators=slf.forestParams['Ntree'], max_features="auto", bootstrap = True, oob_score = True, max_samples = slf.forestParams['fraction'], min_samples_leaf=slf.forestParams['tps']),
+                   estimator = ExtraTreesRegressor(random_state=10, n_estimators=slf.forestParams['Ntree'], max_features=nfeat, bootstrap = True, oob_score = True, max_samples = slf.forestParams['fraction'], min_samples_leaf=slf.forestParams['tps']),
                    n_estimators = 'auto',
                    max_iter = 100 # number of trials to perform
                 )
@@ -1293,7 +1293,7 @@ class adaptiveDesignProcedure:
         #RF training
         for k in range(10) :
             slf.trainExtraTressMIMO(trainingData)
-            joblib.dump([slf.reg, slf.scalerout], slf.forestFile[0:slf.forestFile.index('.')]+'_'+str(k)+'.pkl',compress=1)
+            joblib.dump([slf.reg, slf.scalerout], slf.forestFile[0:slf.forestFile.rfind('.')]+'_'+str(k)+'.pkl',compress=1)
 
         #Save trees
         joblib.dump([slf.reg, slf.scalerout], slf.forestFile)
@@ -1348,7 +1348,8 @@ class adaptiveDesignProcedure:
             'names': slf.headersTabVar,
             'types': slf.typevarTabVar
             }
-        joblib.dump([slf.reg, slf.scalerout, inpVarParam, tabVarParam], slf.forestFile[0:slf.forestFile.index('.')]+'_forCFD.pkl')
+
+        joblib.dump([slf.reg, slf.scalerout, inpVarParam, tabVarParam], slf.forestFile[0:slf.forestFile.rfind('.')]+'_forCFD.pkl')
         logger.info('\n----------------------- Model for CFD generated -----------------------\n')
 
         logger.info('\n--------------------------- Procedure stats ---------------------------\n')
