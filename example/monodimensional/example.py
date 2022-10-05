@@ -8,10 +8,10 @@
     |------------------------------------------------------------------|
     |                                                                  |
     |  Author: Mauro Bracconi                                          |
-    |           mauro.bracconi@polimi.it                               |                         
+    |           mauro.bracconi@polimi.it                               |
     |           Politecnico di Milano                                  |
     |           Dipartimento di Energia                                |
-    |           Laboratory of Catalysis and Catalytic Processes        |   
+    |           Laboratory of Catalysis and Catalytic Processes        |
     |                                                                  |
     |------------------------------------------------------------------|
     |                                                                  |
@@ -41,23 +41,23 @@ import adaptiveDesignProcedure as adp
 ## Function which evaluates the values of the function to be tabulated
 
 def getRate(x):
-    """Compute the function value 
-        
+    """Compute the function value
+
         Parameters
         ----------
             x : np.array[number records, number input variables]
                 Input data
-            
+
         Return
         ----------
             y : np.array[number records, number tabulation variables]
                 Function values
-                
+
     """
     x = x.reshape(-1,1)
 
     u = 150
-	
+
     y = 1/(1+np.exp(-u*(x-0.5)))*(1/(x**1))+1
     return y.reshape(-1,1)
 
@@ -91,7 +91,7 @@ queryRest       = 'query_output.dat'
 
 # Independent variables (i.e., descriptors)
 input_var = ( { 'name' : 'A', 'min' : 1e-3, 'max' : 1, 'num' : 4, 'typevar' : 'lin'}, )
-            
+
 # Tabulated variables
 tabulation_var = (  {'name' : 'Y', 'typevar' : 'lin'}, )
 
@@ -99,14 +99,14 @@ tabulation_var = (  {'name' : 'Y', 'typevar' : 'lin'}, )
 query_p = 1000
 
 # Initialize ADPforML class
-adpML = adp.adaptiveDesignProcedure(input_var, 
-                                    tabulation_var, 
-                                    forestFile, 
-                                    trainingFile, 
-                                    forestParams, 
-                                    algorithmParams, 
+adpML = adp.adaptiveDesignProcedure(input_var,
+                                    tabulation_var,
                                     getRate,
-                                    queryFile, 
+                                    forestFile,
+                                    trainingFile,
+                                    forestParams,
+                                    algorithmParams,
+                                    queryFile,
                                     queryRest)
 
 # Create benchmark dataset (optional)
@@ -118,7 +118,7 @@ adpML.createTrainingDataAndML()
 
 
 
-	
+
 
 
 
