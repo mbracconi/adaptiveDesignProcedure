@@ -107,7 +107,8 @@ adpML = adp.adaptiveDesignProcedure(input_var,
                                     forestParams,
                                     algorithmParams,
                                     queryFile,
-                                    queryRest)
+                                    queryRest,
+                                    plot=True)
 
 # Create benchmark dataset (optional)
 adpML.createBenchmarkDataset(query_p)
@@ -115,18 +116,13 @@ adpML.createBenchmarkDataset(query_p)
 # Create training and RF
 adpML.createTrainingDataAndML()
 
+x,y = adpML.trainingData.T
+for i in range(len(x)):
+    print("%10.2f"%x[i], "%10.2f"%y[i])
 
+print("")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+x = np.linspace(0.0,1.0,10)
+y = adpML.predict( x.reshape(-1,1) ).T[0]
+for i in range(len(x)):
+    print("%10.2f"%x[i], "%10.2f"%y[i])

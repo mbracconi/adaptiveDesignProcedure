@@ -64,6 +64,33 @@ else:
     nfeat='auto'
 #mpl.use('Agg')
 
+
+def predict(idata, forestFile) :
+
+    reg,scal,inpVarParam,tabVarParam = joblib.load(forestFile)
+
+    localData = []
+    data = np.copy(idata)
+    for numInput in range(inpVarParam['quantity']):
+        # Properly scales the input variables
+        if (inpVarParam['types'][numInput] == 'log'):
+            data[:,numInput] = np.log10(data[:,numInput])
+        elif (inpVarParam['types'][numInput] == 'inv'):
+            data[:,numInput] = 1./(data[:,numInput])
+
+    supp = reg.predict(data)
+    if (len(supp.shape) == 1):
+        supp = supp.reshape(-1,1)
+
+    for numTab in range(tabVarParam['quantity']):
+        if (tabVarParam['types'][numTab] == 'log'):
+            supp[:,numTab] = 10**supp[:,numTab]
+
+    pred = scal.inverse_transform(supp)
+
+    return pred
+
+
 class adaptiveDesignProcedure:
     def __init__(slf,  in_variables,
                        tab_variables,
@@ -75,11 +102,12 @@ class adaptiveDesignProcedure:
                        queryFile = None,
                        queryTabVar = None,
                        benchmark = True,
-                       plot = True,
+                       plot = False,
                        debug = False,
                        useBoruta = True,
                        useBorutaWeak = True,
-                       outputDir = 'adp.results'):
+                       outputDir = 'adp.results',
+                       randomSeed = None):
 
         """Class constructor
 
@@ -177,21 +205,29 @@ class adaptiveDesignProcedure:
             shutil.rmtree(slf.outputDir)
         os.mkdir(slf.outputDir)
 
+        self.nrstate = None
+        if randomSeed is not None:
+            self.nrstate = np.random.get_state()
+            np.random.seed( seed=randomSeed )
+
+        # Storing training data
+        slf.trainingData = None
+
         # Default forest parameters
         slf.forestParams = {
                 'Ntree'       : 200,
                 'tps'         : 1,
-                'fraction'    : 0.9,
+                'fraction'    : 0.7,
             }
 
         # Default algorithm parameters
         slf.algorithmParams = {
-                'dth'         : 0.2,     # thresold first derivative
-                'd2th'        : 0.8,     # thresold second derivative
-                'VIth'        : 0.10,    # thresold variable importance
+                'dth'         : 0.1,     # thresold first derivative
+                'd2th'        : 0.9,     # thresold second derivative
+                'VIth'        : 0.15,    # thresold variable importance
                 'errTh'       : 1e-6,    # thresold for MRE error evaluation (remove from MRE calculation record below this value)
                 'OOBth'       : 0.05,    # termination criterium on OOBnorm
-                'RADth'       : 70,      # termination criterium on Relative Approximation Error (RAD) [%]
+                'RADth'       : 10,      # termination criterium on Relative Approximation Error (RAD) [%]
                 'maxTDSize'   : 200,     # maximum allowed size of the training data
                 'AbsOOBTh'    : 0.2,     # maximum variations between OOB for two different tabulation variables
             }
@@ -209,6 +245,7 @@ class adaptiveDesignProcedure:
 
         # Assign forest and training data file path
         slf.forestFile         = slf.outputDir+'/'+forestFile
+        slf.forestFileForCFD   = slf.forestFile[0:slf.forestFile.rfind('.')]+'_forCFD.pkl'
         slf.trainingFile       = slf.outputDir+'/'+'tmp/'+trainingFile
 
         # Assign forest and algorithm params
@@ -331,6 +368,13 @@ class adaptiveDesignProcedure:
             logger.info('    {')
             logger.info('\n'.join('        {}: {}'.format(k, v) for k, v in t.items()))
             logger.info('    }')
+
+
+	def __del__(slf):
+        """Class destructor
+        """
+        if slf.nrstate is not None:
+            numpy.random.set_state( slf.nrstate )
 
 
     def trainExtraTressMISO(slf,trainingData) :
@@ -1095,6 +1139,7 @@ class adaptiveDesignProcedure:
             rates=np.expand_dims(rates,1)
             rates_plot=np.expand_dims(rates_plot,1)
 
+            trainingDataRaw = trainingData.copy()
             trainingData = np.append(trainingData, rates, axis=1)
 
             # Create training data for ExtraTrees
@@ -1112,6 +1157,20 @@ class adaptiveDesignProcedure:
 
             # Write training file(for both training datasets)
             np.savetxt(slf.trainingFile,trainingDataSupp,delimiter=',',header=str(slf.headersInVar))
+
+            # Transforming back the rates
+            pred = rates.copy()
+            if(len(pred.shape) == 1) :
+                pred = pred.reshape(-1,1)
+
+            for k in range(slf.numberOfTabVariables) :
+                if (slf.typevarTabVar[k] == 'log') :
+                    pred[:,k] = 10**pred[:,k]
+
+            pred = slf.scalerout.inverse_transform(pred)
+            pred = np.append(trainingDataRaw, pred, axis=1)
+            slf.trainingData = pred
+
             if (count > 0 or equidistantPoints) :
                 np.savetxt(slf.outputDir+'/'+'rates.dat',ratesAll,delimiter=',',header=str(slf.headersTabVar))
 
@@ -1349,7 +1408,7 @@ class adaptiveDesignProcedure:
             'types': slf.typevarTabVar
             }
 
-        joblib.dump([slf.reg, slf.scalerout, inpVarParam, tabVarParam], slf.forestFile[0:slf.forestFile.rfind('.')]+'_forCFD.pkl')
+        joblib.dump([slf.reg, slf.scalerout, inpVarParam, tabVarParam], slf.forestFileForCFD)
         logger.info('\n----------------------- Model for CFD generated -----------------------\n')
 
         logger.info('\n--------------------------- Procedure stats ---------------------------\n')
@@ -1402,35 +1461,4 @@ class adaptiveDesignProcedure:
         np.savetxt(slf.outputDir+'/'+slf.queryTabVar,query_val,delimiter=',',header=str(slf.headersTabVar))
 
     def predict( slf, idata ):
-        return predict( idata, slf.forestFile )
-
-    @staticmethod
-    def predict(idata, forestFile) :
-
-        reg,scal,inpVarParam,tabVarParam = joblib.load(forestFile)
-
-        def __predict( data_ ):
-            localData = []
-            data = np.copy(data_)
-            for numInput in range(inpVarParam['quantity']):
-                # Properly scales the input variables
-                if (inpVarParam['types'][numInput] == 'log'):
-                    data[:,numInput] = np.log10(data[:,numInput])
-                elif (inpVarParam['types'][numInput] == 'inv'):
-                    data[:,numInput] = 1./(data[:,numInput])
-
-            supp = reg.predict(data)
-            if (len(supp.shape) == 1):
-                supp = supp.reshape(-1,1)
-
-            for numTab in range(tabVarParam['quantity']):
-                if (tabVarParam['types'][numTab] == 'log'):
-                    supp[:,numTab] = 10**supp[:,numTab]
-
-            pred = scal.inverse_transform(supp)
-
-            return pred
-
-        return __predict( idata )
-
-
+        return predict( idata, slf.forestFileForCFD )
