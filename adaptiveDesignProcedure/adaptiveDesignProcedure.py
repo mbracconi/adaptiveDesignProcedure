@@ -36,10 +36,8 @@
 """
 
 import numpy as np
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-import matplotlib.ticker as mtick
 import os
+import sys
 import shutil
 import time
 import joblib
@@ -58,11 +56,17 @@ from boruta import BorutaPy
 
 from packaging import version
 
+try:
+    import matplotlib as mpl
+    import matplotlib.pyplot as plt
+    import matplotlib.ticker as mtick
+except ImportError as e:
+    pass
+
 if(version.parse(sklearn.__version__) >= version.parse('1.1.1')):
     nfeat=1.0
 else:
     nfeat='auto'
-#mpl.use('Agg')
 
 
 def predict(idata, forestFile) :
@@ -101,13 +105,13 @@ class adaptiveDesignProcedure:
                        algorithmParams = None,
                        queryFile = None,
                        queryTabVar = None,
-                       benchmark = True,
+                       benchmark = False,
                        plot = False,
                        debug = False,
                        useBoruta = True,
                        useBorutaWeak = True,
                        outputDir = 'adp.results',
-                       randomSeed = None):
+                       randomState = None):
 
         """Class constructor
 
@@ -205,10 +209,9 @@ class adaptiveDesignProcedure:
             shutil.rmtree(slf.outputDir)
         os.mkdir(slf.outputDir)
 
-        self.nrstate = None
-        if randomSeed is not None:
-            self.nrstate = np.random.get_state()
-            np.random.seed( seed=randomSeed )
+        slf.randomState = None
+        if randomState is not None:
+            slf.randomState = randomState
 
         # Storing training data
         slf.trainingData = None
@@ -228,7 +231,7 @@ class adaptiveDesignProcedure:
                 'errTh'       : 1e-6,    # thresold for MRE error evaluation (remove from MRE calculation record below this value)
                 'OOBth'       : 0.05,    # termination criterium on OOBnorm
                 'RADth'       : 10,      # termination criterium on Relative Approximation Error (RAD) [%]
-                'maxTDSize'   : 200,     # maximum allowed size of the training data
+                'maxTDSize'   : 5000,    # maximum allowed size of the training data
                 'AbsOOBTh'    : 0.2,     # maximum variations between OOB for two different tabulation variables
             }
 
@@ -313,23 +316,28 @@ class adaptiveDesignProcedure:
         slf.RAD                 = [] # [ [RAD #1, .... RAD #N], [RAD #1, .... RAD #N], [RAD #1, .... RAD #N], ...] # list of lists
 
         # Construct and set Random Forest
-        slf.reg = ExtraTreesRegressor(random_state=10, n_estimators=slf.forestParams['Ntree'], max_features=nfeat, bootstrap = True, oob_score = True, max_samples = slf.forestParams['fraction'], min_samples_leaf=slf.forestParams['tps'])
+        slf.reg = ExtraTreesRegressor(random_state=slf.randomState, n_estimators=slf.forestParams['Ntree'], max_features=nfeat, bootstrap = True, oob_score = True, max_samples = slf.forestParams['fraction'], min_samples_leaf=slf.forestParams['tps'])
 
         # Construct and set the scaler
         slf.scalerout = MinMaxScaler(feature_range=(1e-6,1))
 
         # For plotting purpose
         if(slf.plot) :
-            slf.fig = plt.figure(figsize=(10,4))
-            slf.ax = slf.fig.subplots(nrows=1, ncols=2)
-            plt.subplots_adjust(wspace=0.5,bottom = 0.2,right=0.85)
-            # Panel - 1: Average benchmakrj error evolution wrt training points size
-            slf.ax[0].set_ylabel(r'Average benchmark error [%]')
-            slf.ax[0].set_xlabel(r'Number of training points [-]')
-            # Panel - 2: Parity plot
-            slf.ax[1].set_ylabel(r'ET [kmol $\mathregular{m^{-2} s^{-1}}$]')
-            slf.ax[1].set_xlabel(r'Full Model [kmol $\mathregular{m^{-2} s^{-1}}$]')
-            #slf.ax[1].ticklabel_format(axis = 'both', style = 'sci', useOffset=False)
+            if( 'matplotlib' in sys.modules ):
+                slf.fig = plt.figure(figsize=(10,4))
+                slf.ax = slf.fig.subplots(nrows=1, ncols=2)
+                plt.subplots_adjust(wspace=0.5,bottom = 0.2,right=0.85)
+                # Panel - 1: Average benchmakrj error evolution wrt training points size
+                slf.ax[0].set_ylabel(r'Average benchmark error [%]')
+                slf.ax[0].set_xlabel(r'Number of training points [-]')
+                # Panel - 2: Parity plot
+                slf.ax[1].set_ylabel(r'ET [kmol $\mathregular{m^{-2} s^{-1}}$]')
+                slf.ax[1].set_xlabel(r'Full Model [kmol $\mathregular{m^{-2} s^{-1}}$]')
+                #slf.ax[1].ticklabel_format(axis = 'both', style = 'sci', useOffset=False)
+            else:
+                print('WARNING: Because matlibplot is not installed, the option ``plot=True`` will be disregarded.')
+                print('         Consider to install matplotlib to visualize the results!')
+                print('         $ pip install matplotlib')
 
         # Create supporting folders
         if os.path.exists(slf.outputDir+'/'+'tmp') :
@@ -370,13 +378,6 @@ class adaptiveDesignProcedure:
             logger.info('    }')
 
 
-	def __del__(slf):
-        """Class destructor
-        """
-        if slf.nrstate is not None:
-            numpy.random.set_state( slf.nrstate )
-
-
     def trainExtraTressMISO(slf,trainingData) :
         """Train ExtraTrees algorithm for absolute value of the rate and for the sign of a single variables
 
@@ -386,7 +387,7 @@ class adaptiveDesignProcedure:
                 Matrix consisting of the training data: first numberOfVariables columns are the descriptors followed by the absolute value rate and by the sign
         """
         # Load training data
-        slf.reg.set_params(random_state=np.random.randint(low=1, high=20000))
+        slf.reg.set_params(random_state=slf.randomState)
 
         # Fit Trees
         slf.reg.fit(trainingData[:,0:slf.numberOfInputVariables],trainingData[:,-1])
@@ -401,7 +402,7 @@ class adaptiveDesignProcedure:
                 Matrix consisting of the training data: first numberOfVariables columns are the descriptors followed by the absolute value rate and by the sign
         """
         # Load training data
-        slf.reg.set_params(random_state=np.random.randint(low=1, high=20000), bootstrap=True, max_samples = 0.95, oob_score = False)
+        slf.reg.set_params(random_state=slf.randomState, bootstrap=True, max_samples = 0.95, oob_score = False)
 
         ind_data = trainingData[:,slf.numberOfInputVariables:]
         if (ind_data.shape[1] == 1) :
@@ -500,6 +501,8 @@ class adaptiveDesignProcedure:
                 Define how to treat the tabulated variable (either 'log' or 'lin')
 
         """
+        if 'matplotlib' not in sys.modules:
+            return
 
         ratesDI = np.loadtxt(slf.outputDir+'/'+slf.queryTabVar,skiprows=1,delimiter=',',usecols=(indexTabVariable))
         queryData = np.loadtxt(slf.outputDir+'/'+slf.queryFile, skiprows=1, delimiter=',')
@@ -567,6 +570,9 @@ class adaptiveDesignProcedure:
                 Define how to treat the tabulated variable (either 'log' or 'lin')
 
         """
+
+        if 'matplotlib' not in sys.modules:
+            return
 
         ratesDI = np.loadtxt(slf.outputDir+'/'+slf.queryTabVar,skiprows=1,delimiter=',')
         queryData = np.loadtxt(slf.outputDir+'/'+slf.queryFile, skiprows=1, delimiter=',')
@@ -1200,7 +1206,7 @@ class adaptiveDesignProcedure:
             if (slf.useBoruta):
                 boruta = BorutaPy(
                    # estimator = slf.reg,
-                   estimator = ExtraTreesRegressor(random_state=10, n_estimators=slf.forestParams['Ntree'], max_features=nfeat, bootstrap = True, oob_score = True, max_samples = slf.forestParams['fraction'], min_samples_leaf=slf.forestParams['tps']),
+                   estimator = ExtraTreesRegressor(random_state=slf.randomState, n_estimators=slf.forestParams['Ntree'], max_features=nfeat, bootstrap = True, oob_score = True, max_samples = slf.forestParams['fraction'], min_samples_leaf=slf.forestParams['tps']),
                    n_estimators = 'auto',
                    max_iter = 100 # number of trials to perform
                 )
