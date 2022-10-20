@@ -1,3 +1,5 @@
+[![Python application](https://github.com/mbracconi/adaptiveDesignProcedure/actions/workflows/python-app.yml/badge.svg?branch=dev_nestor_wf)](https://github.com/mbracconi/adaptiveDesignProcedure/actions/workflows/python-app.yml)
+
 # adaptiveDesignProcedure
 
 A design procedure of the training data for Machine Learning algorithms able to iteratively add datapoints according to function discrete gradient.
