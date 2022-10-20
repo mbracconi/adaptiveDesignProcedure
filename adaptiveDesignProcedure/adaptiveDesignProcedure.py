@@ -412,7 +412,7 @@ class adaptiveDesignProcedure:
                 Matrix consisting of the training data: first numberOfVariables columns are the descriptors followed by the absolute value rate and by the sign
         """
         # Load training data
-        slf.reg.set_params(random_state=slf.randomState, bootstrap=True, max_samples = 1, oob_score = False)
+        slf.reg.set_params(random_state=slf.randomState, bootstrap=True, max_samples = 0.95, oob_score = False)
 
         ind_data = trainingData[:,slf.numberOfInputVariables:]
         if (ind_data.shape[1] == 1) :
