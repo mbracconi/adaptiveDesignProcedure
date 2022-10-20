@@ -11,6 +11,6 @@ then
     echo "PASSED"
 else
     echo "FAILED"
-    diff report.old report.new
+    paste -d "~" report.old report.new | sed 's/~/         |/g'
     exit -1
 fi
