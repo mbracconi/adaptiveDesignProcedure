@@ -71,10 +71,17 @@ else:
 
 def predict(idata, forestFile) :
 
+    # Read the pickle file
     reg,scal,inpVarParam,tabVarParam = joblib.load(forestFile)
 
-    localData = []
+    # Copy data
     data = np.copy(idata)
+
+    # When input is monodimensional reshape
+    if (len(data.shape) == 1):
+        data = data.reshape(-1,1)
+
+    # Prepare input 
     for numInput in range(inpVarParam['quantity']):
         # Properly scales the input variables
         if (inpVarParam['types'][numInput] == 'log'):
@@ -82,14 +89,17 @@ def predict(idata, forestFile) :
         elif (inpVarParam['types'][numInput] == 'inv'):
             data[:,numInput] = 1./(data[:,numInput])
 
+    # Predict data from ML model
     supp = reg.predict(data)
     if (len(supp.shape) == 1):
         supp = supp.reshape(-1,1)
 
+    # Output post-processing
     for numTab in range(tabVarParam['quantity']):
         if (tabVarParam['types'][numTab] == 'log'):
             supp[:,numTab] = 10**supp[:,numTab]
 
+    # Inverse scaling
     pred = scal.inverse_transform(supp)
 
     return pred
@@ -402,7 +412,7 @@ class adaptiveDesignProcedure:
                 Matrix consisting of the training data: first numberOfVariables columns are the descriptors followed by the absolute value rate and by the sign
         """
         # Load training data
-        slf.reg.set_params(random_state=slf.randomState, bootstrap=True, max_samples = 0.95, oob_score = False)
+        slf.reg.set_params(random_state=slf.randomState, bootstrap=True, max_samples = 1, oob_score = False)
 
         ind_data = trainingData[:,slf.numberOfInputVariables:]
         if (ind_data.shape[1] == 1) :
@@ -1068,6 +1078,7 @@ class adaptiveDesignProcedure:
                 # Predict with the old forest
                 # Build query
                 queryDataVal = np.empty((added.shape[0],slf.numberOfInputVariables))
+                addedSup = queryDataVal
                 for k in range(slf.numberOfInputVariables) :
                     if (slf.typevarInVar[k] == 'log') :
                         queryDataVal[:,k] = np.log10(added[:,k])
@@ -1090,8 +1101,6 @@ class adaptiveDesignProcedure:
                 elif (slf.typevarTabVar[indexTabVariable] == 'lin') :
                     rates = rates.ravel()
 
-
-                addedSup = queryDataVal
                 addedra = np.array(addedra)
 
                 addedra = np.expand_dims(addedra,1)
@@ -1159,31 +1168,17 @@ class adaptiveDesignProcedure:
                     trainingDataSupp[:,k] = 1./trainingData[:,k]
 
             # Append rates
-            trainingDataSupp = np.append(trainingDataSupp, rates, axis=1) #aggiungo valore assoluto
+            trainingDataSupp = np.append(trainingDataSupp, rates, axis=1)
 
             # Write training file(for both training datasets)
             np.savetxt(slf.trainingFile,trainingDataSupp,delimiter=',',header=str(slf.headersInVar))
 
-            # Transforming back the rates
-            pred = rates.copy()
-            if(len(pred.shape) == 1) :
-                pred = pred.reshape(-1,1)
-
-            for k in range(slf.numberOfTabVariables) :
-                if (slf.typevarTabVar[k] == 'log') :
-                    pred[:,k] = 10**pred[:,k]
-
-            pred = slf.scalerout.inverse_transform(pred)
-            pred = np.append(trainingDataRaw, pred, axis=1)
-            slf.trainingData = pred
-
             if (count > 0 or equidistantPoints) :
                 np.savetxt(slf.outputDir+'/'+'rates.dat',ratesAll,delimiter=',',header=str(slf.headersTabVar))
 
-            # Ranger grow forest (done 10 times to get a less biased OOB especially in the case of small dataset)
+            # Grow forest (done 10 times to get a less biased OOB especially in the case of small dataset)
             OOB = []
             OOBScore = []
-            # Ranger grow forest (done 10 times to get a less biased OOB especially in the case of small dataset)
 
             for k in range(10) :
                 slf.trainExtraTressMISO(trainingDataSupp)
@@ -1340,8 +1335,19 @@ class adaptiveDesignProcedure:
         if(len(rates.shape) == 1) :
             rates = rates.reshape(-1,1)
 
-        plotData=np.c_[trainingData, rates]
-        np.savetxt(slf.outputDir+'/'+'plotDataFinal.dat',plotData,delimiter='    ',header=str(slf.headersInVar))
+        # Create plot data (trainingData)
+        # 1) Unprocess input
+        # 2) Add rates
+        slf.trainingData = np.copy(trainingData)
+        # Prepare input
+        for k in range(slf.numberOfInputVariables) :
+            if (slf.typevarInVar[k] == 'log') :
+                slf.trainingData[:,k] = 10**(slf.trainingData[:,k])
+            elif (slf.typevarInVar[k] == 'inv') :
+                slf.trainingData[:,k] = 1./slf.trainingData[:,k]
+
+        slf.trainingData=np.c_[slf.trainingData, rates]
+        np.savetxt(slf.outputDir+'/'+'plotDataFinal.dat',slf.trainingData, delimiter='    ',header=str(slf.headersInVar))
 
         slf.scalerout.fit(rates)
         rates=slf.scalerout.transform(rates)
@@ -1467,4 +1473,32 @@ class adaptiveDesignProcedure:
         np.savetxt(slf.outputDir+'/'+slf.queryTabVar,query_val,delimiter=',',header=str(slf.headersTabVar))
 
     def predict( slf, idata ):
-        return predict( idata, slf.forestFileForCFD )
+        # Copy data
+        data = np.copy(idata)
+
+        # When input is monodimensional reshape
+        if (len(data.shape) == 1):
+            data = data.reshape(-1,1)
+
+        # Prepare input
+        for k in range(slf.numberOfInputVariables) :
+            if (slf.typevarInVar[k] == 'log') :
+                data[:,k] = np.log10(data[:,k])
+            elif (slf.typevarInVar[k] == 'inv') :
+                data[:,k] = 1./data[:,k]
+
+        # Predict data from ML model
+        supp = slf.reg.predict(data)
+        if (len(supp.shape) == 1):
+            supp = supp.reshape(-1,1)
+
+        # Output post-processing
+        for k in range(slf.numberOfTabVariables):
+            if (slf.typevarTabVar[k] == 'log'):
+                supp[:,k] = 10**supp[:,k]
+
+        # Inverse scaling
+        pred = slf.scalerout.inverse_transform(supp)
+
+        return pred
+
