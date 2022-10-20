@@ -122,11 +122,11 @@ print('')
 print('> Training data:')
 x,y = adpML.trainingData.T
 for i in range(len(x)):
-    print('%10.2f'%x[i], '%10.2f'%y[i])
+    print('%10.3f'%x[i], '%10.3f'%y[i])
 
 print('')
 print('> Predicted data:')
 x = np.linspace(0.0,1.0,10)
 y = adpML.predict( x.reshape(-1,1) ).T[0]
 for i in range(len(x)):
-    print('%10.2f'%x[i], '%10.2f'%y[i])
+    print('%10.3f'%x[i], '%10.3f'%y[i])

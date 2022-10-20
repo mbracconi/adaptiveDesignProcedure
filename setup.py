@@ -36,7 +36,6 @@ setup(name='adaptiveDesignProcedure',
 			'joblib',
 			'scikit-learn',
 			'boruta',
-			'logging',
 			'packaging'
 	  ],
 	  extras_require={ 'docs': ['Sphinx', 'sphinx_rtd_theme'] },
