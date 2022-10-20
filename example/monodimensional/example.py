@@ -110,7 +110,7 @@ adpML = adp.adaptiveDesignProcedure(input_var,
                                     queryRest,
                                     benchmark=True,
                                     plot=True,
-                                    randomState=10)
+                                    randomState=100)
 
 # Create benchmark dataset (optional)
 adpML.createBenchmarkDataset(query_p)
