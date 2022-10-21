@@ -81,7 +81,7 @@ def predict(idata, forestFile) :
     if (len(data.shape) == 1):
         data = data.reshape(-1,1)
 
-    # Prepare input 
+    # Prepare input
     for numInput in range(inpVarParam['quantity']):
         # Properly scales the input variables
         if (inpVarParam['types'][numInput] == 'log'):
