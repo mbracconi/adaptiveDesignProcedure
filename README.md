@@ -1,4 +1,4 @@
-![Python application](https://github.com/mbracconi/adaptiveDesignProcedure/workflows/Python%20application/badge.svg?branch=dev_nestor)
+[![Python application](https://github.com/mbracconi/adaptiveDesignProcedure/actions/workflows/python-app.yml/badge.svg)](https://github.com/mbracconi/adaptiveDesignProcedure/actions/workflows/python-app.yml)
 
 # adaptiveDesignProcedure
 
