@@ -81,7 +81,7 @@ def predict(idata, forestFile) :
     if (len(data.shape) == 1):
         data = data.reshape(-1,1)
 
-    # Prepare input 
+    # Prepare input
     for numInput in range(inpVarParam['quantity']):
         # Properly scales the input variables
         if (inpVarParam['types'][numInput] == 'log'):
@@ -412,7 +412,7 @@ class adaptiveDesignProcedure:
                 Matrix consisting of the training data: first numberOfVariables columns are the descriptors followed by the absolute value rate and by the sign
         """
         # Load training data
-        slf.reg.set_params(random_state=slf.randomState, bootstrap=True, max_samples = 1, oob_score = False)
+        slf.reg.set_params(random_state=slf.randomState, bootstrap=True, max_samples = 0.95, oob_score = False)
 
         ind_data = trainingData[:,slf.numberOfInputVariables:]
         if (ind_data.shape[1] == 1) :
