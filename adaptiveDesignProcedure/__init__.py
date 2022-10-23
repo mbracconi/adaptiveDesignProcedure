@@ -6,10 +6,10 @@
     |------------------------------------------------------------------|
     |                                                                  |
     |  Author: Mauro Bracconi                                          |
-    |           mauro.bracconi@polimi.it                               |                         
+    |           mauro.bracconi@polimi.it                               |
     |           Politecnico di Milano                                  |
     |           Dipartimento di Energia                                |
-    |           Laboratory of Catalysis and Catalytic Processes        |   
+    |           Laboratory of Catalysis and Catalytic Processes        |
     |                                                                  |
     |------------------------------------------------------------------|
     |                                                                  |
@@ -29,7 +29,7 @@
     |   Description:                                                   |
     |       Python class implementing the Adaptive Refinment           |
     |       Procedure for Machine Learning using ExtraTress            |
-    |       and derivative-based addition of new points                |   
+    |       and derivative-based addition of new points                |
     |                                                                  |
     |   Version:                                                       |
     |       * 1.0 (02/10/2020): adaptive refinement procedure          |
@@ -53,4 +53,4 @@ __mail__ = 'mauro.bracconi@polimi.it'
 __maintainer__ = __author__
 __status__ = "Alpha"
 
-from .adaptiveDesignProcedure import adaptiveDesignProcedure
+from .adaptiveDesignProcedure import *

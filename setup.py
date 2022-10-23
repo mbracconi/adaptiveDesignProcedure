@@ -16,7 +16,7 @@ description = (
 )
 
 setup(name='adaptiveDesignProcedure',
-	  version='1.3.0',
+	  version='1.4.0',
 	  description='adaptiveDesignProcedure',
 	  long_description=description,
 	  classifiers=[
@@ -33,16 +33,12 @@ setup(name='adaptiveDesignProcedure',
 	  license='BSD',
 	  packages=['adaptiveDesignProcedure'],
 	  install_requires=[
-	  		'numpy',
-	  		'scipy',
-	  		'matplotlib',
-	  		'scikit-learn',
-                        'boruta',
-                        'logging',
-                        'packaging',
-	  		'Sphinx',
-	  		'sphinx_rtd_theme'
+			'joblib',
+			'scikit-learn',
+			'boruta',
+			'packaging'
 	  ],
+	  extras_require={ 'docs': ['Sphinx', 'sphinx_rtd_theme'] },
 	  test_suite='',
 	  tests_require=[''],
 	  include_package_data=True,

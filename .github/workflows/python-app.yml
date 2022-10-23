@@ -1,0 +1,21 @@
+name: Python application
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8.10
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8.10
+    - name: Install package
+      run: |
+        python3 setup.py install --user
+    - name: Tests
+      run: |
+        cd example/monodimensional; ./test.sh
