@@ -935,6 +935,8 @@ class adaptiveDesignProcedure:
             else:
                     # Read from file
                     pOld=np.loadtxt(slf.trainingFile,delimiter=',',skiprows=1,usecols=tuple([i for i in range(slf.numberOfInputVariables)]))
+                    if( len(pOld.shape) == 1):
+                        pOld = pOld.reshape(-1,1)
 
                     for i in range(slf.numberOfInputVariables) :
                         if (slf.typevarInVar[i] == 'log') :
