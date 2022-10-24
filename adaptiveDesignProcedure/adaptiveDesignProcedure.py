@@ -1129,7 +1129,7 @@ class adaptiveDesignProcedure:
                     ratesAll = slf.approxFunction(trainingData)
 
                     if(ratesAll.shape[1] != slf.numberOfTabVariables) :
-                        logger.error ('\nFATAL ERROR: shape of tabulation variable matrix is wrong, obtained: ' + ratesAll.shape[1] + ' expected: ' + slf.numberOfTabVariables)
+                        logger.error ('\nFATAL ERROR: shape of tabulation variable matrix is wrong, obtained: ' + str(ratesAll.shape[1]) + ' expected: ' + str(slf.numberOfTabVariables))
                         exit()
 
                     ratesAll = np.array(ratesAll)
