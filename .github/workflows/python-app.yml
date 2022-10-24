@@ -18,4 +18,4 @@ jobs:
         python3 setup.py install --user
     - name: Tests
       run: |
-        cd examples; ./test.sh
+        cd tests; ./test.sh
