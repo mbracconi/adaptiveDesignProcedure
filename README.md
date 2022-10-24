@@ -50,7 +50,7 @@ As an example, the "Showcase of the procedure" (Section 4.1 - M. Bracconi & M. M
 
 Open a terminal and go to example directory:
 ```bash
-> cd example
+> cd examples/monodimensional
 ```
 
 Run the example:
