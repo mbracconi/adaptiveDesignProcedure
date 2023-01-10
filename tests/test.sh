@@ -5,7 +5,7 @@ function runDir()
     example_name=$1
 
     echo -n "Running $example_name ... "
-    python3 ${example_name}.py > ${example_name}.out 2> /dev/null
+    python3 ${example_name}.py > ${example_name}.out 2> ${example_name}.err
     grep -A40 "> Training data" ${example_name}_orig.out > report.old
     grep -A40 "> Training data" ${example_name}.out > report.new
     check=`paste report.old report.new | awk '($0!~/^>/ && $0!~/^\s+$/){diff=sqrt(($NF-$(NF/2))**2); if(diff>0.0){loc=1; print 1; exit} }END{if(loc==0) print 0}'`
@@ -18,6 +18,8 @@ function runDir()
     else
         echo "FAILED"
         paste -d "~" report.old report.new | sed 's/~/         |/g'
+        echo "ERROR messages:"
+        cat ${example_name}.err
         exit -1
     fi
 }
