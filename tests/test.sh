@@ -24,6 +24,11 @@ function runDir()
 
 function main()
 {
+    echo "Using `python3 --version`"
+    echo "Using Scikit-learn `python3 -c "import sklearn; print(sklearn.__version__)"`"
+    echo -n "Checking adaptiveDesignProcedure ... "
+    python3 -c "import adaptiveDesignProcedure" && echo "OK"
+
     for dir in `ls`
     do
         [ $dir = "test.sh" ] && continue
