@@ -69,7 +69,16 @@ else:
     nfeat='auto'
 
 
-def predict(idata, forestFile) :
+def predict(idata, forestPath) :
+
+    forestFile = None
+    if os.path.isdir( forestPath ):
+        forestFile = forestPath+'/ml_ExtraTrees_forCFD.pkl'
+    elif os.path.isfile(path):
+        forestFile = forestPath
+    else:
+        print("\nERROR: predict(). Trying to open an special file (socket, FIFO, device file)" )
+        exit(1)
 
     # Read the pickle file
     reg,scal,inpVarParam,tabVarParam = joblib.load(forestFile)
