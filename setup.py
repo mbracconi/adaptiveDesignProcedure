@@ -35,8 +35,8 @@ setup(name='adaptiveDesignProcedure',
 	  install_requires=[
 			'joblib',
 			'numpy==1.23.4'
-			'scikit-learn',
-			'boruta',
+			'scikit-learn==1.1.2',
+			'boruta==0.3',
 			'packaging'
 	  ],
 	  extras_require={ 'docs': ['Sphinx', 'sphinx_rtd_theme'] },
