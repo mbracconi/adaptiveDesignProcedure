@@ -34,7 +34,7 @@ setup(name='adaptiveDesignProcedure',
 	  packages=['adaptiveDesignProcedure'],
 	  install_requires=[
 			'joblib',
-			'numpy<1.24.0'
+			'numpy==1.23.4'
 			'scikit-learn',
 			'boruta',
 			'packaging'
