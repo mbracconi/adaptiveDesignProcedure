@@ -74,7 +74,7 @@ def predict(idata, forestPath) :
     forestFile = None
     if os.path.isdir( forestPath ):
         forestFile = forestPath+'/ml_ExtraTrees_forCFD.pkl'
-    elif os.path.isfile(path):
+    elif os.path.isfile( forestPath ):
         forestFile = forestPath
     else:
         print("\nERROR: predict(). Trying to open an special file (socket, FIFO, device file)" )
@@ -260,7 +260,7 @@ class adaptiveDesignProcedure:
         formatter = logging.Formatter('%(message)s')
         flh = logging.FileHandler(slf.outputDir+'/'+'output_adp.log', mode='w', encoding='UTF-8')
         flh.setFormatter(formatter)
-        ch = logging.StreamHandler()
+        ch = logging.StreamHandler(stream=sys.stdout)
         ch.setLevel(logging.INFO)
         logger.addHandler(ch)
         logger.addHandler(flh)
@@ -297,13 +297,14 @@ class adaptiveDesignProcedure:
         slf.points_spec = []
         for spec in in_variables :
             slf.headersInVar.append(spec['name'])
-            slf.typevarInVar.append(spec['typevar'])
+            typevar = spec.get('typevar','lin')
+            slf.typevarInVar.append( typevar )
             slf.min_range.append(spec['min'])
             slf.max_range.append(spec['max'])
             slf.points_spec.append(spec['num'])
             if (spec['name'] == 'T') :
                 slf.numberOfSpecies -= 1
-            if(spec['typevar'] != 'log' and spec['typevar'] != 'inv' and spec['typevar'] != 'lin') :
+            if(typevar != 'log' and typevar != 'inv' and typevar != 'lin') :
                 logger.error('\nFATAL ERROR: variable type for ' + spec['name'] + ' not supported (log, inv, lin)\n')
                 exit()
             if(spec['min'] <= 0) :
@@ -321,8 +322,10 @@ class adaptiveDesignProcedure:
         slf.typevarTabVar = []
         for tabv in tab_variables :
             slf.headersTabVar.append(tabv['name'])
-            slf.typevarTabVar.append(tabv['typevar'])
-            if(tabv['typevar'] != 'log' and tabv['typevar'] != 'lin') :
+            typevar = tabv.get('typevar', 'lin')
+            slf.typevarTabVar.append( typevar )
+
+            if(typevar != 'log' and typevar != 'lin') :
                 logger.error('\nFATAL ERROR: variable type for ' + spec['name'] + ' not supported (log, lin)\n')
                 exit()
 
@@ -362,16 +365,19 @@ class adaptiveDesignProcedure:
         if os.path.exists(slf.outputDir+'/'+'tmp') :
             shutil.rmtree(slf.outputDir+'/'+'tmp')
         os.mkdir(slf.outputDir+'/'+'tmp')
-        if os.path.exists(slf.outputDir+'/'+'figures') :
-            shutil.rmtree(slf.outputDir+'/'+'figures')
-        os.mkdir(slf.outputDir+'/'+'figures')
+
+        if 'matplotlib' in sys.modules:
+            if os.path.exists(slf.outputDir+'/'+'figures') :
+                shutil.rmtree(slf.outputDir+'/'+'figures')
+            os.mkdir(slf.outputDir+'/'+'figures')
 
         # Printing
         logger.info('\n------ Adaptive generation of Training Data for Machine Learning ------')
         logger.info('\nInput parameters:')
         logger.info('  * Forest file: ' + slf.forestFile)
         logger.info('  * Training file: ' + slf.trainingFile)
-        logger.info('  * Figure path: ' + slf.outputDir+'/'+'figures')
+        if 'matplotlib' in sys.modules:
+            logger.info('  * Figure path: ' + slf.outputDir+'/'+'figures')
         logger.info('  * Plotting enabled: ' + str(slf.plot))
         logger.info('  * Boruta as feature selector: ' + str(slf.useBoruta))
         if (slf.useBoruta):
