@@ -1,11 +1,13 @@
 #!/bin/bash
 
+[ -z "$PYTHON_EXEC" ] && export PYTHON_EXEC=python3
+
 function runDir()
 {
     example_name=$1
 
     echo -n "Running $example_name ... "
-    python3 ${example_name}.py > ${example_name}.out 2> ${example_name}.err
+    $PYTHON_EXEC ${example_name}.py > ${example_name}.out 2> ${example_name}.err
     grep -A40 "> Training data" ${example_name}_orig.out > report.old
     grep -A40 "> Training data" ${example_name}.out > report.new
     check=`paste report.old report.new | awk '($0!~/^>/ && $0!~/^\s+$/){diff=sqrt(($NF-$(NF/2))**2); if(diff>0.0){loc=1; print 1; exit} }END{if(loc==0) print 0}'`
@@ -26,10 +28,10 @@ function runDir()
 
 function main()
 {
-    echo "Using `python3 --version`"
-    echo "Using Scikit-learn `python3 -c "import sklearn; print(sklearn.__version__)"`"
+    echo "Using `$PYTHON_EXEC --version`"
+    echo "Using Scikit-learn `$PYTHON_EXEC -c "import sklearn; print(sklearn.__version__)"`"
     echo -n "Checking adaptiveDesignProcedure ... "
-    python3 -c "import adaptiveDesignProcedure" && echo "OK"
+    $PYTHON_EXEC -c "import adaptiveDesignProcedure" && echo "OK"
 
     for dir in `ls`
     do
