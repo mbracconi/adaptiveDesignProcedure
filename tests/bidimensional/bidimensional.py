@@ -131,7 +131,7 @@ print('> Predicted data:')
 x = np.logspace(-6,-1,5).reshape(-1,1)
 xv,yv = np.meshgrid(x, x, indexing='xy')
 inp = np.hstack([xv.reshape(-1,1), yv.reshape(-1,1)])
-z = adpML.predict(inp)
+z = adpML.predict(inp).reshape(-1)
 
 for i in range(len(inp[:,0])):
     print('%10.3e'%inp[i,0], '%10.3e'%inp[i,1], '%10.3f'%z[i])
