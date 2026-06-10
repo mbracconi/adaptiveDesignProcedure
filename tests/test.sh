@@ -1,6 +1,7 @@
 #!/bin/bash
 
 [ -z "$PYTHON_EXEC" ] && export PYTHON_EXEC=python3
+[ -z "$MPLBACKEND" ] && export MPLBACKEND=Agg
 
 function runDir()
 {
