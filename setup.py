@@ -41,7 +41,8 @@ setup(
     install_requires=[
         'joblib',
         'numpy',
-        'scikit-learn',
+        'scikit-learn==1.8.0; python_version >= "3.11" and python_version < "3.13"',
+        'scikit-learn; python_version < "3.11"',
         'boruta',
         'packaging'
     ],
