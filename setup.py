@@ -17,7 +17,7 @@ description = (
 
 setup(
     name='adaptiveDesignProcedure',
-    version='1.4.2',
+    version='1.4.3',
     description='adaptiveDesignProcedure',
     long_description=description,
     classifiers=[
@@ -28,6 +28,8 @@ setup(
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
+        'Programming Language :: Python :: 3.14',
         'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering :: Chemical Engineering'
     ],
@@ -37,11 +39,11 @@ setup(
     author_email='mauro.bracconi@polimi.it',
     license='BSD',
     packages=['adaptiveDesignProcedure'],
-    python_requires='>=3.8, <3.13',
+    python_requires='>=3.8, <3.15',
     install_requires=[
         'joblib',
         'numpy',
-        'scikit-learn==1.8.0; python_version >= "3.11" and python_version < "3.13"',
+        'scikit-learn==1.8.0; python_version >= "3.11" and python_version < "3.15"',
         'scikit-learn; python_version < "3.11"',
         'boruta',
         'packaging'
